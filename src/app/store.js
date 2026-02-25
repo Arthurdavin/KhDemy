@@ -1,10 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit'
-// You can add slices later (user, courses, cart...)
-export const store = configureStore({
-  reducer: {
-    // example: courses: coursesReducer,
-  },
-})
+// import { configureStore } from "@reduxjs/toolkit";
+// import coursesReducer from "./features/courseSlice";
+// import authReducer from "./features/auth/authSlice";
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+// export const store = configureStore({
+//   reducer: {
+//     courses: coursesReducer,
+//     auth: authReducer,
+//   },
+// });
