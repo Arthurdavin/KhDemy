@@ -17,6 +17,7 @@ import Navbar from './components/layout/NavBarComponent';
 import Footer from './components/layout/FooterComponent';
 
 function App() {
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
