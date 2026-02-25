@@ -1,1 +1,33 @@
 @import "tailwindcss";
+
+@theme {
+
+  --color-primary: #2F327D;
+  --color-secondary: #DB2C2C;
+  --color-Ascent: #F59E0B;
+  --color-Description text: #696984;
+  --color-Text color:#000000;
+  --color-background page:#FFFFFF;
+  --color-Ascent:#0088FF;
+  --color-Ascent color: #FF1493;
+  --color-Text color: #FFFFFF;
+  --color-background button: #F75F65;
+  --color-background text: #F5F5FC;
+
+  
+  /* This adds your custom fonts to Tailwind */
+  --font-inter: "Inter", sans-serif;
+  --font-kantum: "Kantumruy Pro", sans-serif;
+}
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Kantumruy+Pro:wght@400;700&display=swap');
+
+/* Apply defaults to the whole site */
+@layer base {
+  body {
+    background-color: var(--color-bg-dark);
+    color: white;
+    font-family: var(--font-inter);
+  }
+}
