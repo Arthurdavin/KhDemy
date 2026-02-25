@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import React from 'react'
+import Navbar from '../components/layout/NavBarComponent'
 
 // Mock data fetching (replace with real API later)
 const fetchPopularCourses = async () => {
@@ -21,30 +23,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Header / Navbar */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold text-blue-600">KhDemy</span>
-          </div>
-
-          <nav className="hidden md:flex items-center gap-8">
-            <Link to="/courses" className="text-gray-700 hover:text-blue-600">Courses</Link>
-            <Link to="/library" className="text-gray-700 hover:text-blue-600">Library</Link>
-            <Link to="/blog" className="text-gray-700 hover:text-blue-600">Blog</Link>
-            <Link to="/about" className="text-gray-700 hover:text-blue-600">About Us</Link>
-          </nav>
-
-          <div className="flex items-center gap-4">
-            <button className="hidden sm:block px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">
-              Login
-            </button>
-            {/* Mobile menu button */}
-            <button className="md:hidden text-gray-700">☰</button>
-          </div>
-        </div>
-      </header>
-
+      <Navbar />
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-50 via-purple-50 to-yellow-50 py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

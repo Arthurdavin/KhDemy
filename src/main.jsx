@@ -10,20 +10,78 @@
 // )
 
 
+// import React from 'react'
+// import ReactDOM from 'react-dom/client'
+// import { Provider } from 'react-redux'
+// import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+// import { BrowserRouter } from 'react-router-dom'
+// import store from './store'
+// import App from './App'
+// import './index.css'
+
+
+//  ReactDOM.createRoot(document.getElementById('root')).render(
+//    <React.StrictMode>
+//      <App />
+//    </React.StrictMode>,
+//  )
+
+
+// const queryClient = new QueryClient({
+//   defaultOptions: { 
+//     queries: { 
+//       staleTime: 1000 * 60 * 5,
+//       retry: 1 // Recommended: don't infinitely retry failed requests
+//     } 
+//   },
+// })
+
+// const rootElement = document.getElementById('root');
+
+// if (!rootElement) {
+//   throw new Error("Failed to find the root element. Check your index.html");
+// }
+
+// ReactDOM.createRoot(rootElement).render(
+//   <React.StrictMode>
+//     <Provider store={store}>
+//       <QueryClientProvider client={queryClient}>
+//         <BrowserRouter>
+//           <App />
+//         </BrowserRouter>
+//       </QueryClientProvider>
+//     </Provider>
+//   </React.StrictMode>,
+// )
+
+
+// main.jsx  (or index.jsx)
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
-import store from './store'
+
+import store from './store'           // ← this line is fine if store.js exists
 import App from './App'
 import './index.css'
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: 1000 * 60 * 5 } },
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,     // 5 minutes
+      retry: 1,
+    },
+  },
 })
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root')
+
+if (!rootElement) {
+  throw new Error('Failed to find the root element. Check your index.html')
+}
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
@@ -32,5 +90,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </BrowserRouter>
       </QueryClientProvider>
     </Provider>
-  </React.StrictMode>,
+  </React.StrictMode>
 )
