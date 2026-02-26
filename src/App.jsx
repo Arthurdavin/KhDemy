@@ -12,14 +12,19 @@
 // export default App
 
 import { Routes, Route } from 'react-router-dom'
-import Home from './pages/Home'
+import Home from './pages/Homepage'
+import Register from './pages/Register'
+import Login from './pages/Login'
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
-        <Route path="/" element={<Home />} />
-        {/* Add later: /courses, /login, /library etc */}
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/home" element={<Home />} />
+        {/* Add later: /courses, /library etc */}
       </Routes>
     </div>
   )
