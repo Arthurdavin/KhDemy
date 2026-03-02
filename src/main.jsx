@@ -7,13 +7,17 @@ import BlogDetail from './pages/blog/BlogDetail.jsx'
 import AboutUs from './pages/AboutUs.jsx'
 import Bd from './pages/blog/BlogAndDetail.jsx'
 import BlogAndDetail from './pages/blog/BlogAndDetail.jsx'
+import CoursesPage from './pages/course/Courses.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     {/* <App /> */}
     {/* <Blog /> */}
     {/* <BlogDetail/> */}
     {/* <AboutUs/> */}
-  <BlogAndDetail/> 
-    
+    {/* <BlogAndDetail/>  */}
+
+    <CoursesPage />
+
+
   </StrictMode>,
 )
