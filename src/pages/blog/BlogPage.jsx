@@ -353,19 +353,7 @@ function BlogCard({ blog, index, onSelect }) {
         <div className="bp-card-author">
           <div className="bp-card-av"><img src="/sarikapro.jpg" alt="Sarika" /></div>
           <span className="bp-card-aname">{blog.author}</span>
-          {/* Save bookmark button */}
-          <button
-            className="bp-save-btn"
-            title={saved ? "Saved" : "Save"}
-            onClick={e => { e.stopPropagation(); setSaved(s => !s) }}
-            style={{ marginLeft:"auto", background:"none", border:"none", cursor:"pointer", padding:4, display:"flex", alignItems:"center", color: saved ? "#2D2A8E" : "#d1d5db", transition:"color .2s, transform .2s" }}
-            onMouseEnter={e => e.currentTarget.style.transform="scale(1.25)"}
-            onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-            </svg>
-          </button>
+          <span className="bp-card-arrow">→</span>
         </div>
       </div>
     </div>

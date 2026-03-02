@@ -4,6 +4,7 @@ import BlogPage from './pages/blog/BlogPage';
 import Homepage from './pages/Homepage';
 import NotFound from './components/home/NotFound';
 import AboutUs from './pages/AboutUs';
+import CoursesPage from './pages/course/Courses';
 
 
 function App() {
@@ -14,7 +15,7 @@ function App() {
         <Route element={<RootLayout />}>
           <Route path="/" element={<Homepage />} />
           <Route path="/blog" element={<BlogPage />} />
-          {/* <Route path="/courses" element={<CreateCourse />} /> */}
+          <Route path="/courses" element={<CoursesPage/>} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="*" element={<NotFound />} />
         </Route>
