@@ -1,10 +1,6 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import {
-  useCreateCourseMutation,
-  useUpdateCourseMutation,
-  useGetCourseByIdQuery,
-} from "../../features/courses/courseApi";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCreateCourseMutation } from "../../features/courses/courseApi";
 import { useGetCategoriesQuery } from "../../features/categories/categoriesApi";
 import { toast } from "react-toastify";
 import {
@@ -21,50 +17,22 @@ import {
 } from "lucide-react";
 
 export default function CreateCourse() {
-  const navigate  = useNavigate();
-  const { id }    = useParams(); // present on edit route
-
-  const [createCourse, { isLoading: isCreating }] = useCreateCourseMutation();
-  const [updateCourse, { isLoading: isUpdating }] = useUpdateCourseMutation();
-  const { data: categories = [] }                  = useGetCategoriesQuery();
-
-  // ── Fetch existing course when editing ─────────────────────────────────────
-  const { data: courseData, isLoading: isFetching } = useGetCourseByIdQuery(id, { skip: !id });
+  const navigate = useNavigate();
+  const [createCourse, { isLoading }] = useCreateCourseMutation();
+  const { data: categories = [] } = useGetCategoriesQuery();
 
   const [error, setError]       = useState("");
   const [tagInput, setTagInput] = useState("");
 
   const [formData, setFormData] = useState({
-    title:       "",
+    title: "",
     description: "",
     category_id: "",
-    thumbnail:   "",
-    tags:        [],
-    lessons:     [{ title: "", description: "", video_url: "" }],
+    thumbnail: "",
+    tags: [],
+    lessons: [{ title: "", description: "", video_url: "" }],
   });
 
-  // ── Populate form when editing ─────────────────────────────────────────────
-  useEffect(() => {
-    if (courseData) {
-      setFormData({
-        title:       courseData.title       || "",
-        description: courseData.description || "",
-        category_id: courseData.category_id ? String(courseData.category_id) : "",
-        thumbnail:   courseData.thumbnail   || "",
-        tags:        courseData.tags?.map((t) => (typeof t === "string" ? t : t.name)) || [],
-        lessons:
-          courseData.lessons?.length
-            ? courseData.lessons.map((l) => ({
-                title:       l.title       || "",
-                description: l.description || "",
-                video_url:   l.video_url   || "",
-              }))
-            : [{ title: "", description: "", video_url: "" }],
-      });
-    }
-  }, [courseData]);
-
-  // ── Field helpers ──────────────────────────────────────────────────────────
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError("");
@@ -111,7 +79,6 @@ export default function CreateCourse() {
     setFormData({ ...formData, lessons });
   };
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -123,53 +90,27 @@ export default function CreateCourse() {
     const payload = {
       ...formData,
       category_id: Number(formData.category_id),
+      tags: formData.tags,
     };
 
     try {
-      if (id) {
-        await updateCourse({ id, ...payload }).unwrap();
-        toast.success("Course updated successfully!");
-      } else {
-        await createCourse(payload).unwrap();
-        toast.success("Course created successfully!");
-      }
+      await createCourse(payload).unwrap();
+      toast.success("Course created successfully!");
       navigate("/dashboard/courses");
     } catch (err) {
-      setError(err?.data?.detail || `Failed to ${id ? "update" : "create"} course.`);
+      setError(err?.data?.detail || "Failed to create course. Please try again.");
     }
   };
 
-  // ── Style tokens ───────────────────────────────────────────────────────────
+  // ── Shared style tokens ─────────────────────────────────────────────────────
   const inputCls =
     "w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-400 outline-none transition-all duration-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100";
+
   const labelCls =
     "block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2";
+
   const sectionCls =
     "bg-white border border-gray-100 rounded-2xl p-7 shadow-sm";
-
-  const isLoading = isCreating || isUpdating;
-
-  // ── Loading skeleton while fetching course to edit ─────────────────────────
-  if (id && isFetching) {
-    return (
-      <div className="max-w-3xl space-y-5 animate-pulse">
-        <div className="h-8 w-64 bg-gray-100 rounded-xl" />
-        <div className="bg-white border border-gray-100 rounded-2xl p-7 shadow-sm space-y-4">
-          <div className="h-4 w-32 bg-gray-100 rounded" />
-          <div className="h-10 bg-gray-100 rounded-xl" />
-          <div className="h-24 bg-gray-100 rounded-xl" />
-          <div className="grid grid-cols-2 gap-4">
-            <div className="h-10 bg-gray-100 rounded-xl" />
-            <div className="h-10 bg-gray-100 rounded-xl" />
-          </div>
-        </div>
-        <div className="bg-white border border-gray-100 rounded-2xl p-7 shadow-sm space-y-3">
-          <div className="h-4 w-24 bg-gray-100 rounded" />
-          <div className="h-32 bg-gray-100 rounded-xl" />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-3xl">
@@ -177,16 +118,10 @@ export default function CreateCourse() {
       {/* ── Page header ── */}
       <div className="mb-8">
         <h1 className="text-2xl font-black text-gray-800">
-          {id
-            ? <>Edit <span className="text-indigo-600">Course</span></>
-            : <>Create a <span className="text-indigo-600">New Course</span></>
-          }
+          Create a <span className="text-indigo-600">New Course</span>
         </h1>
         <p className="text-sm text-gray-400 mt-1">
-          {id
-            ? "Update the course details, lessons, and settings below."
-            : "Fill in the details below. Add lessons and tag your course for discoverability."
-          }
+          Fill in the details below. Add lessons and tag your course for discoverability.
         </p>
       </div>
 
@@ -204,7 +139,9 @@ export default function CreateCourse() {
           <div className="space-y-5">
             {/* Title */}
             <div>
-              <label className={labelCls}>Course Title <span className="text-red-400">*</span></label>
+              <label className={labelCls}>
+                Course Title <span className="text-red-400">*</span>
+              </label>
               <input
                 name="title"
                 placeholder="e.g. Introduction to Python"
@@ -216,7 +153,9 @@ export default function CreateCourse() {
 
             {/* Description */}
             <div>
-              <label className={labelCls}>Description <span className="text-red-400">*</span></label>
+              <label className={labelCls}>
+                Description <span className="text-red-400">*</span>
+              </label>
               <textarea
                 name="description"
                 placeholder="What will students learn? Who is this course for?"
@@ -230,7 +169,9 @@ export default function CreateCourse() {
             {/* Category + Thumbnail */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className={labelCls}>Category <span className="text-red-400">*</span></label>
+                <label className={labelCls}>
+                  Category <span className="text-red-400">*</span>
+                </label>
                 <select
                   name="category_id"
                   value={formData.category_id}
@@ -243,6 +184,7 @@ export default function CreateCourse() {
                   ))}
                 </select>
               </div>
+
               <div>
                 <label className={labelCls}>Thumbnail URL</label>
                 <input
@@ -258,16 +200,25 @@ export default function CreateCourse() {
             {/* Tags */}
             <div>
               <label className={labelCls}>
-                <span className="inline-flex items-center gap-1.5"><Tag size={11} /> Tags</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Tag size={11} /> Tags
+                </span>
               </label>
               <div
                 className={`${inputCls} flex flex-wrap gap-2 items-center min-h-[48px] py-2 cursor-text`}
                 onClick={() => document.getElementById("tag-input").focus()}
               >
                 {formData.tags.map((tag) => (
-                  <span key={tag} className="inline-flex items-center gap-1 bg-indigo-50 border border-indigo-200 text-indigo-600 text-xs px-3 py-1 rounded-full font-medium">
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 bg-indigo-50 border border-indigo-200 text-indigo-600 text-xs px-3 py-1 rounded-full font-medium"
+                  >
                     {tag}
-                    <button type="button" onClick={(e) => { e.stopPropagation(); removeTag(tag); }} className="hover:text-indigo-900 transition-colors">
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); removeTag(tag); }}
+                      className="hover:text-indigo-900 transition-colors"
+                    >
                       <X size={11} />
                     </button>
                   </span>
@@ -283,9 +234,11 @@ export default function CreateCourse() {
                 />
               </div>
               <p className="text-gray-400 text-xs mt-1.5">
-                Press <kbd className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-mono text-[11px]">Enter</kbd>{" "}
-                or <kbd className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-mono text-[11px]">,</kbd>{" "}
-                to add a tag
+                Press{" "}
+                <kbd className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-mono text-[11px]">Enter</kbd>
+                {" "}or{" "}
+                <kbd className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-mono text-[11px]">,</kbd>
+                {" "}to add a tag
               </p>
             </div>
           </div>
@@ -301,7 +254,8 @@ export default function CreateCourse() {
               <h2 className="text-base font-bold text-gray-800">
                 Lessons
                 <span className="ml-2 text-xs text-gray-400 font-normal">
-                  ({formData.lessons.length} {formData.lessons.length === 1 ? "lesson" : "lessons"})
+                  ({formData.lessons.length}{" "}
+                  {formData.lessons.length === 1 ? "lesson" : "lessons"})
                 </span>
               </h2>
             </div>
@@ -316,51 +270,89 @@ export default function CreateCourse() {
 
           <div className="space-y-4">
             {formData.lessons.map((lesson, i) => (
-              <div key={i} className="border border-gray-100 rounded-xl p-5 bg-gray-50/60 group hover:border-indigo-100 transition-colors">
+              <div
+                key={i}
+                className="border border-gray-100 rounded-xl p-5 bg-gray-50/60 group hover:border-indigo-100 transition-colors"
+              >
+                {/* Lesson header */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-600 text-xs font-black">{i + 1}</span>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Lesson {i + 1}</span>
+                    <span className="w-6 h-6 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-600 text-xs font-black">
+                      {i + 1}
+                    </span>
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                      Lesson {i + 1}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button type="button" onClick={() => moveLesson(i, -1)} disabled={i === 0}
-                      className="w-7 h-7 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-indigo-500 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() => moveLesson(i, -1)}
+                      disabled={i === 0}
+                      className="w-7 h-7 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-indigo-500 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center justify-center"
+                    >
                       <ChevronUp size={13} />
                     </button>
-                    <button type="button" onClick={() => moveLesson(i, 1)} disabled={i === formData.lessons.length - 1}
-                      className="w-7 h-7 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-indigo-500 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() => moveLesson(i, 1)}
+                      disabled={i === formData.lessons.length - 1}
+                      className="w-7 h-7 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-indigo-500 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center justify-center"
+                    >
                       <ChevronDown size={13} />
                     </button>
-                    <button type="button" onClick={() => removeLesson(i)} disabled={formData.lessons.length === 1}
-                      className="w-7 h-7 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() => removeLesson(i)}
+                      disabled={formData.lessons.length === 1}
+                      className="w-7 h-7 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center justify-center"
+                    >
                       <X size={13} />
                     </button>
                   </div>
                 </div>
+
+                {/* Lesson fields */}
                 <div className="space-y-3">
                   <div>
                     <label className={labelCls}>Lesson Title</label>
-                    <input placeholder="e.g. Variables and Data Types" value={lesson.title}
-                      onChange={(e) => updateLesson(i, "title", e.target.value)} className={inputCls} />
+                    <input
+                      placeholder="e.g. Variables and Data Types"
+                      value={lesson.title}
+                      onChange={(e) => updateLesson(i, "title", e.target.value)}
+                      className={inputCls}
+                    />
                   </div>
                   <div>
                     <label className={labelCls}>Video URL</label>
-                    <input placeholder="https://example.com/videos/lesson.mp4" value={lesson.video_url}
-                      onChange={(e) => updateLesson(i, "video_url", e.target.value)} className={inputCls} />
+                    <input
+                      placeholder="https://example.com/videos/lesson.mp4"
+                      value={lesson.video_url}
+                      onChange={(e) => updateLesson(i, "video_url", e.target.value)}
+                      className={inputCls}
+                    />
                   </div>
                   <div>
                     <label className={labelCls}>Description</label>
-                    <textarea placeholder="What does this lesson cover?" value={lesson.description}
+                    <textarea
+                      placeholder="What does this lesson cover?"
+                      value={lesson.description}
                       onChange={(e) => updateLesson(i, "description", e.target.value)}
-                      rows={2} className={`${inputCls} resize-none`} />
+                      rows={2}
+                      className={`${inputCls} resize-none`}
+                    />
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          <button type="button" onClick={addLesson}
-            className="w-full mt-4 border-2 border-dashed border-gray-200 hover:border-indigo-300 rounded-xl py-3 text-gray-400 hover:text-indigo-500 text-sm transition-all hover:bg-indigo-50/40 flex items-center justify-center gap-2 font-medium">
+          {/* Add lesson dashed button */}
+          <button
+            type="button"
+            onClick={addLesson}
+            className="w-full mt-4 border-2 border-dashed border-gray-200 hover:border-indigo-300 rounded-xl py-3 text-gray-400 hover:text-indigo-500 text-sm transition-all hover:bg-indigo-50/40 flex items-center justify-center gap-2 font-medium"
+          >
             <Plus size={15} /> Add another lesson
           </button>
         </section>
@@ -375,16 +367,29 @@ export default function CreateCourse() {
 
         {/* ── Actions ── */}
         <div className="flex items-center gap-3 pb-4">
-          <button type="button" onClick={() => navigate("/dashboard/courses")}
-            className="px-6 py-3.5 rounded-xl border border-gray-200 text-gray-500 hover:text-gray-800 hover:border-gray-300 text-sm font-medium transition-all">
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/courses")}
+            className="px-6 py-3.5 rounded-xl border border-gray-200 text-gray-500 hover:text-gray-800 hover:border-gray-300 text-sm font-medium transition-all"
+          >
             Cancel
           </button>
-          <button type="submit" disabled={isLoading}
-            className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-xl py-3.5 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-200 active:translate-y-0">
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-xl py-3.5 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-200 active:translate-y-0"
+          >
             {isLoading ? (
-              <><Loader2 size={16} className="animate-spin" />{id ? "Saving…" : "Publishing…"}</>
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Publishing…
+              </>
             ) : (
-              <>{id ? "Save Changes" : "Publish Course"}<ArrowRight size={16} /></>
+              <>
+                Publish Course
+                <ArrowRight size={16} />
+              </>
             )}
           </button>
         </div>

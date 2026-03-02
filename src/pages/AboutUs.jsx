@@ -20,204 +20,154 @@ const TEAM = [
   { name: "Bun Raksa",       role: "Group Member",   quote: "It is soon will be in the past.",   img: "/sarikapro.jpg" },
 ]
 
+// Dark mode works by toggling .dark on <html> via ThemeContext.
+// All colors reference CSS variables that change between :root and :root.dark
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --primary:     #1e1b6e;
-    --primary-lt:  #eeedf8;
-    --primary-md:  #b3b0e0;
-    --secondary:   #e53935;
-    --accent:      #f5a623;
-    --accent-lt:   #fff8ed;
-    --blue:        #2196f3;
-    --blue-lt:     #e3f2fd;
-    --pink:        #e91e8c;
-    --pink-lt:     #fce4f3;
-    --btn-bg:      #ff6b6b;
-    --text-bg:     #f5f5f5;
-    --text:        #111111;
-    --muted:       #9e9e9e;
-    --border:      #e8e8e8;
-    --white:       #ffffff;
+    --primary:    #1e1b6e;
+    --primary-lt: #eeedf8;
+    --primary-md: #b3b0e0;
+    --secondary:  #e53935;
+    --accent:     #f5a623;
+    --blue:       #2196f3;
+    --pink:       #e91e8c;
+    --text:       #111111;
+    --muted:      #9e9e9e;
+    --border:     #e8e8e8;
+    --bg:         #ffffff;
+    --bg-soft:    #fafafa;
+    --bg-card:    #ffffff;
+    --bg-hero:    #eef2ff;
+    --shadow:     rgba(30,27,110,0.10);
   }
 
+  /* ── DARK OVERRIDES ── */
+  :root.dark {
+    --primary-lt: rgba(99,97,210,0.15);
+    --primary-md: #4a47a3;
+    --text:       #f1f1f1;
+    --muted:      #9b9baa;
+    --border:     #2e2e45;
+    --bg:         #0f0f1a;
+    --bg-soft:    #13131f;
+    --bg-card:    #1a1a2e;
+    --bg-hero:    #1a1a3e;
+    --shadow:     rgba(0,0,0,0.40);
+  }
+
+  /* ── BASE ── */
   .page {
-    background: #fff;
+    background: var(--bg);
     color: var(--text);
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
   }
-
   .wrap { max-width: 1100px; margin: 0 auto; padding: 0 60px; }
 
-  /* ═══════════════════════════════
-     HERO
-  ═══════════════════════════════ */
+  /* ── HERO ── */
   .hero {
-    background: #eef2ff;
+    background: var(--bg-hero);
     padding: 56px 0 52px;
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
+    transition: background 0.3s;
   }
-
   .hero-inner {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 32px;
-    align-items: center;
-    position: relative;
-    z-index: 1;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 32px; align-items: center;
+    position: relative; z-index: 1;
   }
-
   .hero-text { text-align: left; }
-
   .hero-title {
-    font-size: clamp(36px, 5vw, 60px);
-    font-weight: 900;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    margin-bottom: 6px;
+    font-size: clamp(36px,5vw,60px); font-weight: 900;
+    line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 6px;
   }
   .hero-title .t-indigo { color: var(--primary); display: block; }
   .hero-title .t-pink   { color: var(--pink);    display: block; }
+  :root.dark .hero-title .t-indigo { color: #8b87ff; }
 
   .hero-underline {
     width: 56px; height: 4px;
     background: linear-gradient(90deg, var(--primary), var(--pink));
-    border-radius: 4px;
-    margin-bottom: 22px;
+    border-radius: 4px; margin-bottom: 22px;
   }
-
-  .hero-desc {
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.8;
-    max-width: 380px;
-    margin-bottom: 36px;
-  }
-
+  .hero-desc { font-size: 14px; color: var(--muted); line-height: 1.8; max-width: 380px; margin-bottom: 36px; }
   .hero-stats { display: flex; gap: 44px; flex-wrap: wrap; }
   .h-stat-num {
-    font-size: clamp(22px, 2.5vw, 30px);
-    font-weight: 900;
-    color: var(--primary);
-    line-height: 1;
-    margin-bottom: 4px;
+    font-size: clamp(22px,2.5vw,30px); font-weight: 900;
+    color: var(--primary); line-height: 1; margin-bottom: 4px;
   }
+  :root.dark .h-stat-num { color: #a5b4fc; }
+
+  /* Fix dot group visibility in dark */
+  :root.dark .dot-sm { opacity: 0.4; }
   .h-stat-lbl { font-size: 12px; color: var(--muted); font-weight: 500; }
 
-  .hero-illus {
-    position: relative;
-    width: clamp(200px, 26vw, 300px);
-    flex-shrink: 0;
-  }
+  .hero-illus { position: relative; width: clamp(200px,26vw,300px); flex-shrink: 0; }
   .hero-illus-blob {
-    position: absolute;
-    width: 200px; height: 200px;
-    border-radius: 50%;
-    background: #C4B5FD;
-    opacity: 0.45;
-    top: -28px; right: -16px;
-    z-index: 0;
+    position: absolute; width: 200px; height: 200px;
+    border-radius: 50%; background: #C4B5FD;
+    opacity: 0.45; top: -28px; right: -16px; z-index: 0;
+    transition: opacity 0.3s;
   }
+  :root.dark .hero-illus-blob { opacity: 0.15; }
   .hero-illus img {
-    position: relative; z-index: 1;
-    width: 100%; object-fit: contain;
+    position: relative; z-index: 1; width: 100%; object-fit: contain;
     filter: drop-shadow(0 8px 24px rgba(30,27,110,0.15));
+    transition: filter 0.3s;
   }
+  :root.dark .hero-illus img { filter: drop-shadow(0 8px 24px rgba(139,135,255,0.2)) brightness(0.85); }
 
   .dot-group { position: absolute; display: flex; gap: 5px; flex-wrap: wrap; width: 56px; pointer-events: none; }
   .dot-sm    { width: 7px; height: 7px; border-radius: 50%; }
   .deco      { position: absolute; pointer-events: none; }
 
-  /* ═══════════════════════════════
-     WHO ARE WE
-  ═══════════════════════════════ */
+  /* ── WHO ARE WE ── */
   .who-section {
-    padding: 88px 0 80px;
-    background: #fff;
-    position: relative;
-    overflow: hidden;
+    padding: 88px 0 80px; background: var(--bg);
+    position: relative; overflow: hidden;
+    transition: background 0.3s;
   }
+  .who-dot { position: absolute; border-radius: 50%; pointer-events: none; animation: wfloat 5s ease-in-out infinite; }
+  @keyframes wfloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
 
-  .who-dot {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: wfloat 5s ease-in-out infinite;
-  }
-  @keyframes wfloat {
-    0%,100% { transform: translateY(0); }
-    50%      { transform: translateY(-10px); }
-  }
-
-  .who-inner {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 64px;
-    align-items: center;
-    position: relative;
-    z-index: 1;
-  }
-
-  .who-left { display: flex; flex-direction: column; gap: 28px; }
+  .who-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; position: relative; z-index: 1; }
+  .who-left  { display: flex; flex-direction: column; gap: 28px; }
 
   .who-cloud {
-    position: relative;
-    background: linear-gradient(135deg, #29b6f6, #0ea5e9);
-    border-radius: 50px 50px 50px 12px;
-    padding: 20px 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: fit-content;
-    box-shadow: 0 10px 36px rgba(14,165,233,0.32);
+    position: relative; background: linear-gradient(135deg,#29b6f6,#0ea5e9);
+    border-radius: 50px 50px 50px 12px; padding: 20px 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: fit-content; box-shadow: 0 10px 36px rgba(14,165,233,0.32);
     animation: popIn 0.6s cubic-bezier(.34,1.56,.64,1) both;
   }
-  @keyframes popIn {
-    from { opacity:0; transform:scale(0.7); }
-    to   { opacity:1; transform:scale(1); }
-  }
-  .who-cloud::before {
-    content:''; position:absolute;
-    width:32px; height:32px;
-    background: linear-gradient(135deg,#29b6f6,#0ea5e9);
-    border-radius:50%; top:-16px; left:28px;
-  }
-  .who-cloud::after {
-    content:''; position:absolute;
-    width:20px; height:20px;
-    background: linear-gradient(135deg,#29b6f6,#0ea5e9);
-    border-radius:50%; top:-26px; left:52px;
-  }
+  @keyframes popIn { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
+  .who-cloud::before { content:''; position:absolute; width:32px; height:32px; background:linear-gradient(135deg,#29b6f6,#0ea5e9); border-radius:50%; top:-16px; left:28px; }
+  .who-cloud::after  { content:''; position:absolute; width:20px; height:20px; background:linear-gradient(135deg,#29b6f6,#0ea5e9); border-radius:50%; top:-26px; left:52px; }
   .who-cloud-puff { position:absolute; background:linear-gradient(135deg,#38c7f8,#0ea5e9); border-radius:50%; }
-  .who-cloud h2 {
-    font-size:clamp(18px,2vw,22px); font-weight:900; color:#fff;
-    white-space:nowrap; letter-spacing:-0.01em; position:relative; z-index:1;
-  }
+  .who-cloud h2 { font-size:clamp(18px,2vw,22px); font-weight:900; color:#fff; white-space:nowrap; letter-spacing:-0.01em; position:relative; z-index:1; }
 
   .who-illus-wrap { position:relative; width:100%; max-width:340px; }
   .who-people-svg {
     position:relative; z-index:1; width:100%;
     filter:drop-shadow(0 8px 24px rgba(30,27,110,0.1));
     animation:fadeUp 0.7s 0.2s ease both;
+    transition: filter 0.3s;
   }
+  :root.dark .who-people-svg { filter: drop-shadow(0 8px 24px rgba(0,0,0,0.4)) brightness(0.75); }
 
   .who-float-card {
-    position:absolute; background:#fff; border-radius:14px;
+    position:absolute; background:var(--bg-card); border-radius:14px;
     padding:9px 15px; display:flex; align-items:center; gap:9px;
-    font-size:12px; font-weight:700; color:#1a1a2e; white-space:nowrap;
-    box-shadow:0 8px 28px rgba(0,0,0,0.10); z-index:2;
+    font-size:12px; font-weight:700; color:var(--text); white-space:nowrap;
+    box-shadow:0 8px 28px var(--shadow); z-index:2;
     animation:fadeUp 0.6s ease both;
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s;
   }
   .who-float-icon { width:28px; height:28px; border-radius:8px; display:grid; place-items:center; font-size:14px; flex-shrink:0; }
-
   .who-right { display:flex; flex-direction:column; gap:20px; animation:fadeUp 0.7s 0.15s ease both; }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
 
   .who-badge {
     display:inline-flex; align-items:center; gap:7px;
@@ -225,34 +175,25 @@ const css = `
     color:var(--primary); font-size:11px; font-weight:700;
     letter-spacing:0.12em; text-transform:uppercase;
     padding:7px 16px; border-radius:100px; width:fit-content;
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
   }
+  :root.dark .who-badge { color: #8b87ff; }
+  .who-desc { font-size:clamp(15px,1.6vw,17px); font-weight:700; line-height:2.0; color:var(--text); max-width:400px; }
 
-  .who-desc {
-    font-size:clamp(15px,1.6vw,17px); font-weight:700;
-    line-height:2.0; color:var(--text); max-width:400px;
-  }
-
-  /* ═══════════════════════════════
-     OUR MISSION
-  ═══════════════════════════════ */
+  /* ── MISSION ── */
   .mission-section {
-    padding:72px 0 80px;
-    background:#fff;
-    border-top:1px solid var(--border);
-    border-bottom:1px solid var(--border);
+    padding:72px 0 80px; background:var(--bg);
+    border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    transition: background 0.3s, border-color 0.3s;
   }
-
-  .mission-heading {
-    font-size:clamp(32px,4vw,52px); font-weight:900;
-    letter-spacing:-0.025em; margin-bottom:48px; line-height:1;
-  }
+  .mission-heading { font-size:clamp(32px,4vw,52px); font-weight:900; letter-spacing:-0.025em; margin-bottom:48px; line-height:1; }
   .mission-heading .red  { color:var(--secondary); }
   .mission-heading .dark { color:var(--text); }
-
   .mission-inner { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
 
-  .mission-photo { border-radius:20px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.1); border:1px solid var(--border); }
-  .mission-photo img { width:100%; height:300px; object-fit:cover; display:block; }
+  .mission-photo { border-radius:20px; overflow:hidden; box-shadow:0 12px 40px var(--shadow); border:1px solid var(--border); transition: border-color 0.3s; }
+  .mission-photo img { width:100%; height:300px; object-fit:cover; display:block; transition: filter 0.3s; }
+  :root.dark .mission-photo img { filter: brightness(0.7); }
 
   .mission-cards { display:flex; flex-direction:column; gap:14px; }
   .mc {
@@ -261,80 +202,57 @@ const css = `
     box-shadow:0 4px 20px rgba(0,0,0,0.08);
     transition:transform 0.2s, box-shadow 0.2s;
   }
-  .mc:hover { transform:translateX(6px); box-shadow:0 8px 28px rgba(0,0,0,0.13); }
+  :root.dark .mc { box-shadow: 0 4px 20px rgba(0,0,0,0.35); }
+  .mc:hover { transform:translateX(6px); box-shadow:0 8px 28px rgba(0,0,0,0.18); }
   .mc:nth-child(1) { margin-left:0; }
   .mc:nth-child(2) { margin-left:32px; }
   .mc:nth-child(3) { margin-left:64px; }
-
-  .mc-icon-wrap {
-    width:42px; height:42px; border-radius:50%;
-    background:rgba(255,255,255,0.25);
-    display:flex; align-items:center; justify-content:center;
-    font-size:20px; flex-shrink:0;
-  }
+  .mc-icon-wrap { width:42px; height:42px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
   .mc-title { font-size:14px; font-weight:800; color:#fff; margin-bottom:4px; }
   .mc-desc  { font-size:12px; color:rgba(255,255,255,0.88); line-height:1.6; }
 
-  /* ═══════════════════════════════
-     MENTORS / TEAM
-  ═══════════════════════════════ */
-  .mentors-section { padding:80px 0; }
-  .team-section    { padding:80px 0; background:#fafafa; }
+  /* ── MENTORS / TEAM ── */
+  .mentors-section { padding:80px 0; background:var(--bg); transition: background 0.3s; }
+  .team-section    { padding:80px 0; background:var(--bg-soft); transition: background 0.3s; }
 
-  .sec-heading {
-    text-align:center; font-size:clamp(24px,3vw,36px); font-weight:900;
-    color:var(--text); margin-bottom:52px; letter-spacing:-0.02em;
-  }
+  .sec-heading { text-align:center; font-size:clamp(24px,3vw,36px); font-weight:900; color:var(--text); margin-bottom:52px; letter-spacing:-0.02em; }
   .sec-heading .accent { color:var(--primary); }
+  :root.dark .sec-heading .accent { color: #8b87ff; }
 
   .mentors-row { display:flex; justify-content:center; gap:40px; flex-wrap:wrap; }
   .mentors-row .pcard { width:240px; }
 
   .pcard {
-    background:#fff;
+    background: var(--bg-card);
     border:1px solid var(--border);
-    border-radius:20px;
-    padding:32px 20px 24px;
+    border-radius:20px; padding:32px 20px 24px;
     text-align:center;
-    transition:box-shadow 0.25s, transform 0.25s, border-color 0.25s;
+    transition: box-shadow 0.25s, transform 0.25s, border-color 0.25s, background 0.3s;
     display:flex; flex-direction:column; align-items:center;
   }
-  .pcard:hover {
-    box-shadow:0 12px 36px rgba(30,27,110,0.12);
-    transform:translateY(-5px);
-    border-color:var(--primary-md);
-  }
-
-  /* no banner — just avatar centered at top */
-  .pcard-banner { display:none; }
+  .pcard:hover { box-shadow:0 12px 36px var(--shadow); transform:translateY(-5px); border-color:var(--primary-md); }
 
   .pcard-av {
-    width:100px; height:100px;
-    border-radius:50%; overflow:hidden;
-    margin-bottom:16px;
-    border:3px solid var(--primary-md);
+    width:100px; height:100px; border-radius:50%; overflow:hidden;
+    margin-bottom:16px; border:3px solid var(--primary-md);
     background:var(--primary-lt);
-    transition:border-color 0.25s, box-shadow 0.25s;
-    flex-shrink:0;
-    position:static; transform:none;
-    box-shadow: 0 4px 16px rgba(30,27,110,0.12);
+    transition: border-color 0.25s, box-shadow 0.25s, background 0.3s;
+    flex-shrink:0; position:static; transform:none;
+    box-shadow: 0 4px 16px var(--shadow);
   }
-  .pcard:hover .pcard-av {
-    border-color:var(--primary);
-    box-shadow:0 6px 24px rgba(30,27,110,0.22);
-  }
+  .pcard:hover .pcard-av { border-color:var(--primary); box-shadow:0 6px 24px var(--shadow); }
   .pcard-av img { width:100%; height:100%; object-fit:cover; object-position:top center; display:block; }
-  .pcard-name  { font-size:15px; font-weight:800; color:var(--text); margin-bottom:5px; }
-  .pcard-role  {
-    display:inline-block;
-    font-size:10px; font-weight:700;
+
+  .pcard-name { font-size:15px; font-weight:800; color:var(--text); margin-bottom:5px; }
+  .pcard-role {
+    display:inline-block; font-size:10px; font-weight:700;
     text-transform:uppercase; letter-spacing:0.1em;
-    color:var(--primary);
-    background:var(--primary-lt);
-    padding:3px 12px; border-radius:100px;
-    margin-bottom:10px;
+    color:var(--primary); background:var(--primary-lt);
+    padding:3px 12px; border-radius:100px; margin-bottom:10px;
+    transition: background 0.3s, color 0.3s;
   }
-  .pcard-quote { font-size:12px; color:#9CA3AF; line-height:1.65; font-style:italic; margin-bottom:16px; min-height:32px; }
+  :root.dark .pcard-role { color: #8b87ff; }
+  .pcard-quote { font-size:12px; color:var(--muted); line-height:1.65; font-style:italic; margin-bottom:16px; min-height:32px; }
 
   .pcard-lg .pcard-av   { width:120px; height:120px; }
   .pcard-lg .pcard-name { font-size:18px; }
@@ -346,13 +264,13 @@ const css = `
     display:flex; align-items:center; justify-content:center;
     transition:transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s; padding:0;
   }
-  .soc-btn:hover { transform:translateY(-3px) scale(1.12); box-shadow:0 6px 16px rgba(0,0,0,0.18); }
+  .soc-btn:hover { transform:translateY(-3px) scale(1.12); box-shadow:0 6px 16px rgba(0,0,0,0.25); }
 
   .team-g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:20px; }
   .team-g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
 
+  /* ── RESPONSIVE ── */
   @media (max-width:1024px) { .wrap { padding:0 32px; } }
-
   @media (max-width:768px) {
     .wrap { padding:0 20px; }
     .hero-inner { grid-template-columns:1fr; }
@@ -360,21 +278,14 @@ const css = `
     .who-inner  { grid-template-columns:1fr; gap:48px; }
     .mission-inner { grid-template-columns:1fr; gap:32px; }
     .mc:nth-child(2), .mc:nth-child(3) { margin-left:0; }
-    .team-g3, .team-g4 {
-      display:flex; flex-wrap:wrap; justify-content:center; gap:16px;
-    }
-    .team-g3 .pcard, .team-g4 .pcard {
-      width:calc(50% - 8px); max-width:210px;
-    }
+    .team-g3, .team-g4 { display:flex; flex-wrap:wrap; justify-content:center; gap:16px; }
+    .team-g3 .pcard, .team-g4 .pcard { width:calc(50% - 8px); max-width:210px; }
     .mentors-row .pcard { width:calc(50% - 8px); max-width:210px; }
   }
-
   @media (max-width:480px) {
     .wrap { padding:0 16px; }
     .hero-stats { gap:20px; }
-    .team-g3, .team-g4 {
-      display:flex; flex-direction:column; align-items:center; gap:16px;
-    }
+    .team-g3, .team-g4 { display:flex; flex-direction:column; align-items:center; gap:16px; }
     .team-g3 .pcard, .team-g4 .pcard { width:100%; max-width:300px; }
     .mentors-row { flex-direction:column; align-items:center; }
     .mentors-row .pcard { width:100%; max-width:300px; }
@@ -384,13 +295,11 @@ const css = `
 function SocialIcons() {
   return (
     <div className="soc-row">
-      {/* Facebook */}
       <button className="soc-btn" title="Facebook" style={{ background:"#0084FF" }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
           <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
         </svg>
       </button>
-      {/* Telegram */}
       <button className="soc-btn" title="Telegram" style={{ background:"#0084FF" }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
           <path d="M21.94 3.4L2.37 10.96c-1.3.52-1.29 1.26-.24 1.58l4.9 1.53 1.91 5.85c.23.65.12.9.8.9.52 0 .75-.24 1.04-.52l2.5-2.43 5.2 3.83c.96.53 1.65.26 1.89-.89l3.43-16.17c.35-1.38-.53-2.01-1.86-1.24z"/>
@@ -466,21 +375,15 @@ export default function AboutUs() {
 
         {/* ══════════ HERO ══════════ */}
         <section className="hero">
-          {/* triangle deco top */}
           <div className="deco" style={{ top:28, right:"38%", width:0, height:0, borderLeft:"10px solid transparent", borderRight:"10px solid transparent", borderBottom:"18px solid #4ADE80" }} />
-          {/* star */}
           <div className="deco" style={{ top:20, right:"22%", fontSize:20, color:"#FBBF24" }}>★</div>
-          {/* purple circle */}
           <div className="deco" style={{ top:16, right:60, width:80, height:80, borderRadius:"50%", background:"#C4B5FD", opacity:0.5 }} />
-
-          {/* bottom dot groups */}
           <div className="dot-group" style={{ bottom:24, left:60 }}>
             {[0,1,2,3,4,5].map(i=><div key={i} className="dot-sm" style={{ background:"#93C5FD" }}/>)}
           </div>
           <div className="dot-group" style={{ bottom:24, right:60 }}>
             {[0,1,2,3,4,5].map(i=><div key={i} className="dot-sm" style={{ background:"#93C5FD" }}/>)}
           </div>
-
           <div className="wrap">
             <div className="hero-inner">
               <div className="hero-text">
@@ -501,7 +404,6 @@ export default function AboutUs() {
                   ))}
                 </div>
               </div>
-
               <div className="hero-illus">
                 <div className="hero-illus-blob" />
                 <img
@@ -523,12 +425,9 @@ export default function AboutUs() {
           <div className="who-dot" style={{ bottom:50, left:"38%", width:16, height:16, background:"#e91e8c", animationDelay:"0.8s" }} />
           <div className="who-dot" style={{ bottom:30, right:90,   width:22, height:22, background:"#f5a623", animationDelay:"1.4s" }} />
           <div className="who-dot" style={{ top:80,   left:40,    width:10, height:10, background:"#1e1b6e", animationDelay:"0.5s" }} />
-
-          {/* squiggle */}
           <svg className="deco" style={{ top:"42%", left:"46%", opacity:0.3 }} width="36" height="36" viewBox="0 0 36 36">
             <path d="M6 28 Q12 8 18 20 Q24 32 30 12" stroke="#2196f3" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
           </svg>
-
           <div className="wrap">
             <div className="who-inner">
               <div className="who-left">
@@ -551,7 +450,6 @@ export default function AboutUs() {
                   </div>
                 </div>
               </div>
-
               <div className="who-right">
                 <div className="who-badge">🎓 ISTAD · Foundation 5th</div>
                 <p className="who-desc">
@@ -576,24 +474,15 @@ export default function AboutUs() {
               <div className="mission-cards">
                 <div className="mc" style={{ background:"#f5a623" }}>
                   <div className="mc-icon-wrap">🌐</div>
-                  <div>
-                    <div className="mc-title">Flexible Learning</div>
-                    <div className="mc-desc">Learn anytime, anywhere, at your own pace.</div>
-                  </div>
+                  <div><div className="mc-title">Flexible Learning</div><div className="mc-desc">Learn anytime, anywhere, at your own pace.</div></div>
                 </div>
                 <div className="mc" style={{ background:"#e91e8c" }}>
                   <div className="mc-icon-wrap">🎧</div>
-                  <div>
-                    <div className="mc-title">24/7 Support</div>
-                    <div className="mc-desc">AI tutors and mentors, always available.</div>
-                  </div>
+                  <div><div className="mc-title">24/7 Support</div><div className="mc-desc">AI tutors and mentors, always available.</div></div>
                 </div>
                 <div className="mc" style={{ background:"#2196f3" }}>
                   <div className="mc-icon-wrap">🎯</div>
-                  <div>
-                    <div className="mc-title">Progress Guarantee</div>
-                    <div className="mc-desc">Analytics and structured paths for real results.</div>
-                  </div>
+                  <div><div className="mc-title">Progress Guarantee</div><div className="mc-desc">Analytics and structured paths for real results.</div></div>
                 </div>
               </div>
             </div>
