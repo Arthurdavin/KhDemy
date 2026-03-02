@@ -1,94 +1,35 @@
-// import { StrictMode } from 'react'
-// import { createRoot } from 'react-dom/client'
-// import './index.css'
-// import App from './App.jsx'
-
-// createRoot(document.getElementById('root')).render(
-//   <StrictMode>
-//     <App />
-//   </StrictMode>,
-// )
+// src/main.jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Homepage'; 
+import AboutUs from './pages/AboutUs';
+import Library from './pages/Library';
 
 
-// import React from 'react'
-// import ReactDOM from 'react-dom/client'
-// import { Provider } from 'react-redux'
-// import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-// import { BrowserRouter } from 'react-router-dom'
-// import store from './store'
-// import App from './App'
-// import './index.css'
+
+import RootLayout from './layout/RootLayout';
 
 
-//  ReactDOM.createRoot(document.getElementById('root')).render(
-//    <React.StrictMode>
-//      <App />
-//    </React.StrictMode>,
-//  )
+import './index.css'; // or your global styles
+import Courses from './pages/course/Courses';
 
-
-// const queryClient = new QueryClient({
-//   defaultOptions: { 
-//     queries: { 
-//       staleTime: 1000 * 60 * 5,
-//       retry: 1 // Recommended: don't infinitely retry failed requests
-//     } 
-//   },
-// })
-
-// const rootElement = document.getElementById('root');
-
-// if (!rootElement) {
-//   throw new Error("Failed to find the root element. Check your index.html");
-// }
-
-// ReactDOM.createRoot(rootElement).render(
-//   <React.StrictMode>
-//     <Provider store={store}>
-//       <QueryClientProvider client={queryClient}>
-//         <BrowserRouter>
-//           <App />
-//         </BrowserRouter>
-//       </QueryClientProvider>
-//     </Provider>
-//   </React.StrictMode>,
-// )
-
-
-// main.jsx  (or index.jsx)
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { Provider } from 'react-redux'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter } from 'react-router-dom'
-
-import store from './store'           // ← this line is fine if store.js exists
-import App from './App'
-import './index.css'
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,     // 5 minutes
-      retry: 1,
-    },
-  },
-})
-
-const rootElement = document.getElementById('root')
-
-if (!rootElement) {
-  throw new Error('Failed to find the root element. Check your index.html')
-}
-
-ReactDOM.createRoot(rootElement).render(
+ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </QueryClientProvider>
-    </Provider>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<RootLayout />}>
+          <Route path="/" element={<Home  />} />
+          <Route path="/courses" element={<Courses />} /> 
+          {/* <Route path="/library" element={<Library />} />  */}
+          {/* <Route path="/blog" element={<Blog />} />  */}
+          {/* <Route path="/about" element={<About />} /> */}
+          {/* <Route path="/login" element={<Login />} />  */}
+
+          {/* Optional: 404 page */}
+           {/* <Route path="*" element={<NotFound />} /> */}
+        </Route>
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>
-)
+);
