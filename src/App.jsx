@@ -13,15 +13,18 @@
 
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Homepage'
-import Register from './pages/Register'
-import Login from './pages/Login'
+import Register from './pages/register/Register'
+import Login from './pages/login/Login'
+import ForgotPassword from './pages/login/ForgotPassword'
 
 function App() {
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
         {/* Add later: /courses, /library etc */}
@@ -31,3 +34,5 @@ function App() {
 }
 
 export default App
+
+

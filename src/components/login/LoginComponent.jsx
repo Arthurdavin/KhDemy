@@ -1,6 +1,10 @@
-
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: z.string().trim().min(1, "Email is required").email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
 const EyeOpen = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -34,13 +38,6 @@ const LockIcon = () => (
   </svg>
 );
 
-const ArrowLeft = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M19 12H5M12 19l-7-7 7-7"/>
-  </svg>
-);
-
 const FacebookIcon = () => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="#1877F2">
     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -56,21 +53,21 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export default function Login() {
+const toFieldErrors = (issues) => {
+  const out = {};
+  issues.forEach((issue) => {
+    const key = issue.path?.[0];
+    if (key && !out[key]) out[key] = issue.message;
+  });
+  return out;
+};
+
+export default function LoginComponent({ onSuccess, onGoRegister, onForgotPassword }) {
   const [form, setForm]                 = useState({ email: "", password: "" });
   const [errors, setErrors]             = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember]         = useState(false);
   const [status, setStatus]             = useState("idle");
-  const navigate = useNavigate();
-
-  const validate = () => {
-    const e = {};
-    if (!form.email.trim())    e.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Invalid email address";
-    if (!form.password)        e.password = "Password is required";
-    return e;
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,12 +77,16 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    const result = loginSchema.safeParse(form);
+    if (!result.success) {
+      setErrors(toFieldErrors(result.error.issues));
+      return;
+    }
+
     setStatus("loading");
     setTimeout(() => {
       setStatus("success");
-      setTimeout(() => navigate("/home"), 700);
+      setTimeout(() => onSuccess?.(), 700);
     }, 1500);
   };
 
@@ -99,76 +100,46 @@ export default function Login() {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
-        @keyframes float  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-        body { font-family: 'DM Sans', sans-serif; background: #111827; }
-      `}</style>
-
-      <div className="min-h-screen grid md:grid-cols-[1fr_1fr] bg-gray-900">
+      <div className="min-h-screen grid grid-cols-1 lg:grid-cols-[1fr_1fr] bg-gray-900 auth-font-body">
 
         {/* ── LEFT PANEL ── */}
-        <div className="hidden md:flex flex-col items-center justify-center relative bg-[#1a2a50] overflow-hidden px-10">
+        <div className="hidden lg:flex flex-col items-center justify-center relative bg-[#1a2a50] overflow-hidden px-10">
           {/* glow */}
           <div className="absolute w-[450px] h-[450px] rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
             style={{ background: "radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%)" }} />
 
-          {/* Illustration circle */}
-          <div className="relative z-10 w-56 h-56 rounded-full bg-[#e8edf5] flex items-center justify-center mb-8"
-            style={{ animation: "float 4s ease-in-out infinite" }}>
-            {/* Simple illustrated person SVG */}
-            <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-              {/* window frame */}
-              <rect x="30" y="20" width="55" height="65" rx="4" fill="#1a2a50" opacity="0.15"/>
-              <rect x="35" y="25" width="45" height="55" rx="2" fill="#c8d8f0"/>
-              <line x1="57" y1="25" x2="57" y2="80" stroke="#a0b8d8" strokeWidth="1.5"/>
-              <line x1="35" y1="52" x2="80" y2="52" stroke="#a0b8d8" strokeWidth="1.5"/>
-              {/* person */}
-              <circle cx="75" cy="72" r="9" fill="#f4c5a8"/>
-              <path d="M60 95 Q75 82 90 95" fill="#1a2a50" opacity="0.8"/>
-              <path d="M68 90 L72 78 L78 78 L82 90" fill="#2a3f7a"/>
-              {/* cloud */}
-              <ellipse cx="48" cy="38" rx="18" ry="12" fill="white" opacity="0.7"/>
-              <ellipse cx="38" cy="42" rx="12" ry="9" fill="white" opacity="0.7"/>
-              <ellipse cx="60" cy="42" rx="10" ry="8" fill="white" opacity="0.7"/>
-            </svg>
+          {/* Illustration panel */}
+          <div className="relative z-10 w-150 rounded-6xl overflow-hidden auth-float flex items-center justify-center mb-8"
+            style={{ background: "rgba(255,255,255,0.08)" }}>
+            <img
+              src="https://cdn.prod.website-files.com/6443d6d96a788f6942166567/647011e6041bb767ea7934ed_mobiledevelopment-1.png"
+              alt="Mobile development illustration"
+              className="max-w-full max-h-full object-contain"
+              loading="lazy"
+            />
+            <div className="absolute bottom-6 inset-x-10 bg-black/60 backdrop-blur-sm rounded-full py-1.5 flex items-center justify-center shadow-lg border border-white/10">
+              <span className="text-white tracking-[0.4rem] text-xs font-semibold uppercase auth-font-title">
+                KH<span className="text-[#e5383b]">DEMY</span>
+              </span>
+            </div>
           </div>
 
           {/* Text */}
-          <h2 className="text-white text-2xl font-bold mb-2 text-center"
-            style={{ fontFamily: "'Syne', sans-serif" }}>
+          <h2 className="text-white text-2xl font-bold mb-2 text-center auth-font-title">
             Welcome <span className="text-[#e5383b]">KH</span>
             <span className="text-[#e5383b]">demy</span>
           </h2>
           <p className="text-white/50 text-sm text-center mb-8">
             Just a couple of clicks and we start
           </p>
-
-          {/* Dots */}
-          <div className="flex gap-2">
-            <div className="w-3 h-3 rounded-full bg-white" />
-            <div className="w-3 h-3 rounded-full bg-white/30" />
-            <div className="w-3 h-3 rounded-full bg-white/20" />
-          </div>
         </div>
 
         {/* ── RIGHT PANEL ── */}
-        <div className="bg-white flex flex-col justify-center px-8 md:px-16 py-12"
-          style={{ animation: "fadeUp 0.45s ease both" }}>
+        <div className="bg-white flex flex-col justify-center px-5 sm:px-8 md:px-12 lg:px-16 py-8 sm:py-10 md:py-12 auth-panel-fade">
 
-          {/* Back arrow */}
-          <button onClick={() => navigate(-1)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg
-                       text-gray-400 hover:text-[#1a2a50] hover:bg-gray-100
-                       transition-all duration-200 mb-10 self-start">
-            <ArrowLeft />
-          </button>
-
-          <div className="max-w-sm w-full mx-auto">
+          <div className="max-w-md w-full mx-auto">
             {/* Title */}
-            <h1 className="text-center text-2xl font-extrabold text-blue-700 mb-1 tracking-tight"
-              style={{ fontFamily: "'Syne', sans-serif" }}>
+            <h1 className="text-center text-2xl font-extrabold text-blue-700 mb-1 tracking-tight auth-font-title">
               LOGIN
             </h1>
             <p className="text-center text-sm text-gray-400 mb-8">
@@ -230,9 +201,13 @@ export default function Login() {
                   />
                   <span className="text-sm text-gray-500">Remember Me</span>
                 </label>
-                <a href="#" className="text-sm text-blue-600 font-semibold hover:underline">
+                <button
+                  type="button"
+                  onClick={() => onForgotPassword?.()}
+                  className="text-sm text-blue-600 font-semibold hover:underline bg-none border-none cursor-pointer p-0"
+                >
                   Forgot Password ?
-                </a>
+                </button>
               </div>
 
               {/* Submit */}
@@ -247,7 +222,7 @@ export default function Login() {
                     ? "bg-green-600 shadow-[0_4px_14px_rgba(22,163,74,0.3)]"
                     : "bg-blue-700 shadow-[0_4px_14px_rgba(37,99,235,0.3)] hover:bg-blue-800",
                 ].join(" ")}
-                style={{ fontFamily: "'Syne', sans-serif" }}>
+              >
                 {status === "idle"    && "Login Now"}
                 {status === "loading" && "Signing in..."}
                 {status === "success" && "✓ Signed In!"}
@@ -280,7 +255,7 @@ export default function Login() {
             <p className="mt-8 text-center text-sm text-gray-400">
               Don't have an account?{" "}
               <button type="button"
-                onClick={() => navigate('/register')}
+                onClick={() => onGoRegister?.()}
                 className="text-blue-700 font-bold underline underline-offset-2 hover:text-blue-900 transition-colors bg-none border-none cursor-pointer p-0">
                 Sign up
               </button>

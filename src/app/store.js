@@ -1,10 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore } from "@reduxjs/toolkit";
 
-// Configure a basic store. Add slices later (user, courses, cart...)
-const store = configureStore({
+// You can add slices later (user, courses, cart, auth...)
+export const store = configureStore({
   reducer: {
+    // example: auth: authReducer,
     // example: courses: coursesReducer,
   },
-})
+});
 
-export default store
