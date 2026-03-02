@@ -17,7 +17,7 @@ const TEAM = [
   { name: "Lut Lina",        role: "Group Member",   quote: "Follow your way, not their words.", img: "/linamember.jpg" },
   { name: "Sroeum Saren",    role: "Group Member",   quote: "Let's grow together.",              img: "/sarean.jpg" },
   { name: "Sea Sengchhay",   role: "Group Member",   quote: "What you Give is What you Get.",    img: "/sengchhymember.jpg" },
-  { name: "Bun Raksa",       role: "Group Member",   quote: "It is soon will be in the past.",   img: "/sarikapro.jpg" },
+  { name: "Bun Raksa",       role: "Group Member",   quote: "It is soon will be in the past.",   img: "/raksamember.jpg" },
 ]
 
 // Dark mode works by toggling .dark on <html> via ThemeContext.
