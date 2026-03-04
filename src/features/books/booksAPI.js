@@ -1,81 +1,70 @@
-import { apiSlice } from "../api/apiSlice";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQuery } from "../baseQuery";
 
-export const booksApi = apiSlice.injectEndpoints({
-  endpoints: (build) => ({
+export const booksApi = createApi({
+  reducerPath: "booksApi",
+  baseQuery,
+  tagTypes: ["Book"],
+  endpoints: (builder) => ({
 
-    // GET /books/?page=1&limit=10&author_id=&search=&category_id=
-    getAllBooks: build.query({
-      query: ({ page = 1, limit = 10, author_id, search, category_id } = {}) => ({
-        url: "/books/",
-        params: {
-          page,
-          limit,
-          ...(author_id   && { author_id }),
-          ...(search      && { search }),
-          ...(category_id && { category_id }),
-        },
-      }),
-      providesTags: (result) =>
-        result
-          ? [
-              ...(Array.isArray(result)
-                ? result
-                : result.books ?? []
-              ).map(({ id }) => ({ type: "Book", id })),
-              { type: "Book", id: "LIST" },
-            ]
-          : [{ type: "Book", id: "LIST" }],
+    // GET /books/?page=1&limit=5
+    getBooks: builder.query({
+      query: ({ page = 1, limit = 5 } = {}) =>
+        `/books/?page=${page}&limit=${limit}`,
+      transformResponse: (res) => {
+        const list = res?.books ?? [];
+        return list.map((b) => ({
+          id:            b.id,
+          title:         b.title ?? "",
+          desc:          b.description ?? "",
+          author:        b.author?.full_name ?? "",
+          thumbnail_url: b.thumbnail_url ?? b.thumbnail ?? null,
+        }));
+      },
+      providesTags: ["Book"],
     }),
 
-    // GET /books/:id/
-    getBookById: build.query({
-      query: (id) => `/books/${id}/`,
-      providesTags: (result, error, id) => [{ type: "Book", id }],
+    // GET /books/  — all books (used by CreateBook to find bookToEdit)
+    getAllBooks: builder.query({
+      query: () => "/books/",
+      providesTags: ["Book"],
     }),
 
     // POST /books/
-    createBook: build.mutation({
-      query: (formData) => ({
+    createBook: builder.mutation({
+      query: (body) => ({
         url: "/books/",
         method: "POST",
-        body: formData,
-        formData: true,
+        body,
       }),
-      invalidatesTags: [{ type: "Book", id: "LIST" }],
+      invalidatesTags: ["Book"],
     }),
 
-    // PATCH /books/:id/
-    updateBook: build.mutation({
-      query: ({ id, data }) => ({
-        url: `/books/${id}/`,
-        method: "PATCH",
-        body: data,
-        formData: true,
+    // PUT /books/:id
+    updateBook: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/books/${id}`,
+        method: "PUT",
+        body,
       }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: "Book", id },
-        { type: "Book", id: "LIST" },
-      ],
+      invalidatesTags: (_res, _err, { id }) => [{ type: "Book", id }, "Book"],
     }),
 
-    // DELETE /books/:id/
-    deleteBook: build.mutation({
+    // DELETE /books/:id
+    deleteBook: builder.mutation({
       query: (id) => ({
-        url: `/books/${id}/`,
+        url: `/books/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, id) => [
-        { type: "Book", id },
-        { type: "Book", id: "LIST" },
-      ],
+      invalidatesTags: ["Book"],
     }),
 
   }),
 });
 
 export const {
+  useGetBooksQuery,
   useGetAllBooksQuery,
-  useGetBookByIdQuery,
   useCreateBookMutation,
   useUpdateBookMutation,
   useDeleteBookMutation,

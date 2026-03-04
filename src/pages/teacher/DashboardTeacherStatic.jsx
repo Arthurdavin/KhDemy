@@ -1,9 +1,8 @@
-import React from 'react'
 import { useSelector } from 'react-redux'
-import StatsCards from './StatsCards'
-import MyCourse from './MyCourse'
-import MyArticle from './MyArticle'
-import MyBook from './MyBook'
+import MyCourse from '../../components/ui/MyCourse'
+import MyArticle from '../../components/ui/MyArticle'
+import MyBook from '../../components/ui/MyBook'
+
 
 export default function DashboardTeacherStatic() {
   const { user } = useSelector((state) => state.auth)

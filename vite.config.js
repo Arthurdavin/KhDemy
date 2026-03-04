@@ -5,7 +5,19 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(),
     tailwindcss(),
+    
   ],
+  // server: {
+  //   port: 5173,
+  //   proxy: {
+  //     "/api": {
+  //       target: "https://khdemy.anajak-khmer.site",
+  //       changeOrigin: true,
+  //       secure: false,
+  //       rewrite: (path) => path.replace(/^\/api/, ""),
+  //     },
+  //   },
+  // },
   
 })
 

@@ -1,128 +1,133 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import RootLayout from './layout/RootLayout';
-import BlogPage from './pages/blog/BlogPage';
-import Homepage from './pages/Homepage';
-import NotFound from './components/home/NotFound';
-import AboutUs from './pages/AboutUs';
-import CoursesPage from './pages/course/Courses';
+import { Routes, Route } from "react-router-dom";
+import RootLayout from "./layout/RootLayout";
+import BlogPage from "./pages/blog/BlogPage";
+import NotFound from "./components/home/NotFound";
+import AboutUs from "./pages/AboutUs";
+import CoursesPage from "./pages/course/Courses";
+import Login from "./pages/login/Login";
+import Registration from "./pages/register/Register";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+import Home from "./pages/Homepage";
+import TeacherDashboard from "./components/teacher/TeacherDashboard";
+import CreateCourse from "./pages/course/CreateCourse";
+import CreateBlog from "./pages/blog/CreateBlog";
+import CreateBook from "./pages/book/CreateBook";
+import MyAllArticles from "./components/ui/MyAllArticle";
+import ProfileCard from "./pages/teacher/ProfileTeacher";
+import AllCoursesTable from "./components/teacher/AllCourses";
+import EditCourse from "./pages/course/EditCourse";
+
+// import TeacherDashboard from "./pages/teacher/TeacherDashboard";
+// import NotFound from "./components/common/NotFound";
 
 function App() {
   return (
-      <Routes>
+    <Routes>
 
-        {/* Public — with Navbar + Footer */}
-        <Route element={<RootLayout />}>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/courses" element={<CoursesPage/>} />
-          <Route path="/about-us" element={<AboutUs />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
+      {/* Public + layout with header/footer */}
+      <Route element={<RootLayout />}>
+        <Route path="/" element={<Home/>} />
+        <Route path="/courses" element={<CoursesPage/>} />
+        {/* <Route path="courses/:id" element={<CourseDetail />} /> */}
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/blogs" element={<BlogPage/>} />
+        {/* <Route path="/profile" element={<TeacherDashboard/>} /> */}
+        <Route path="/profile" element={<TeacherDashboard/>} />
+        <Route path="/teacher/create-course" element={<CreateCourse/>} />
+        <Route path="/create-blog" element={<CreateBlog/>} />
+        <Route path="/teacher/add-book" element={<CreateBook/>} />
+        <Route path="profile/all-blogs" element={<MyAllArticles/>} />
+        <Route path="profile/all-courses" element={<AllCoursesTable/>} />
+        <Route path="/teacher/edit-profile" element={<ProfileCard/>} />
+        <Route path="/dashboard/courses/:id/edit" element={<EditCourse />} />
+      </Route>
+      <Route path="/login" element={<Login  />} />
+      <Route path="/register" element={<Registration/>} />
+
+      {/* Auth pages – clean layout */}
+      {/* <Route element={<AuthLayout />}>
+        <Route path="login" element={<Login />} /> */}
+        {/* <Route path="register" element={<Register />} /> */}
+      {/* </Route> */}
+
+      {/* Protected – student & teacher */}
+      {/* <Route element={<DashboardLayout />}> */}
+        {/* Everyone logged in */}
+        {/* <Route element={<ProtectedRoute />}>
+          <Route path="profile" element={<div>Profile page (later)</div>} />
+        </Route> */}
+
+        {/* Only students */}
+        {/* <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
+          <Route path="student/dashboard" element={<StudentDashboard />} />
+          <Route path="my-courses" element={<MyCourses />} />
+        </Route> */}
+
+        {/* Only teachers */}
+        {/* <Route element={<ProtectedRoute allowedRoles={["teacher"]} />}>
+          <Route path="teacher/dashboard" element={<TeacherDashboard />} />
+          <Route path="teacher/courses" element={<TeacherCourses />} />
+          <Route path="teacher/courses/new" element={<CreateCourse />} />
+        </Route> */}
+      {/* </Route> */}
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 
 export default App;
 
-// import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import ProtectedRoute from "./components/ProtectedRoute";
-
-// // Layout
+// import { Routes, Route } from "react-router-dom";
 // import RootLayout from "./layout/RootLayout";
-
-// // Auth
-// import Login from "./pages/auth/Login";
-// import Register from "./pages/auth/Register";
-
-// // Shared
-// import Unauthorized from "./pages/Unauthorized";
+// import Home from "./pages/Homepage";
+// import CoursesPage from "./pages/course/Courses";
+// import BlogPage from "./pages/blog/BlogPage";
+// import AboutUs from "./pages/AboutUs";
+// import Login from "./pages/login/Login";
+// import Registration from "./pages/register/Register";
 // import NotFound from "./components/home/NotFound";
-// import Profile from "./pages/dashboard/Profile";
 
-// // Teacher
-// import TeacherDashBoard from "./pages/teacher/TeacherDashboard";
-// import AllCourses from "./pages/teacher/AllCourse";
-// import CreateCourse from "./pages/dashboard/CreateCourse";
-// import CreateLesson from "./pages/dashboard/CreateLesson";
-// import AllBook from "./pages/book/AllBook";
-// import CreateBook from "./pages/book/CreateBook";
-// import AllBlogs from "./pages/blog/AllBlogs";
-// import CreateBlog from "./pages/blog/CreateBlog";
-
-// // Student
-// import StudentDashboard from "./pages/student/StudentDashboard";
-// import MyCourses from "./pages/student/MyCourses";
-// import CourseDetail from "./pages/student/CourseDetail";
+// import ProtectedRoute from "./components/ProtectedRoute";
+// import TeacherLayout from "./components/teacher/TeacherLayout";
+// import TeacherDashboard from "./components/teacher/TeacherDashboard";
 
 // function App() {
 //   return (
-//     <BrowserRouter>
-//       <Routes>
-//         <Route element={<RootLayout />}>
+//     <Routes>
 
-//           {/* ===== TEACHER ROUTES ===== */}
-//           <Route
-//             path="/teacher"
-//             element={
-//               <ProtectedRoute roles={["teacher"]}>
-//                 <TeacherDashBoard />
-//               </ProtectedRoute>
-//             }
-//           >
-//             <Route path="profile" element={<Profile />} />
+//       {/* Public Layout */}
+//       <Route element={<RootLayout />}>
+//         <Route path="/" element={<Home />} />
+//         <Route path="/courses" element={<CoursesPage />} />
+//         <Route path="/blogs" element={<BlogPage />} />
+//         <Route path="/about" element={<AboutUs />} />
+//       </Route>
 
-//             {/* Courses */}
-//             <Route path="courses" element={<AllCourses />} />
-//             <Route path="courses/create" element={<CreateCourse />} />
-//             <Route path="courses/:id/edit" element={<CreateCourse />} />
+//       {/* Auth */}
+//       <Route path="/login" element={<Login />} />
+//       <Route path="/register" element={<Registration />} />
 
-//             {/* Lessons */}
-//             <Route path="lessons/create" element={<CreateLesson />} />
-//             <Route path="courses/:id/lessons/create" element={<CreateLesson />} />
+//       {/* Teacher Protected Routes */}
+//       <Route element={<ProtectedRoute allowedRoles={["teacher"]} />}>
+//         <Route path="/profile" element={<TeacherDashboard/>} />
+//         {/* <Route path="/teacher" element={<TeacherLayout />}>
+//           <Route path="/profile" element={<TeacherDashboard/>} />
+//           <Route path="create-course" element={<div>Create Course Page</div>} />
+//           <Route path="add-lesson" element={<div>Add Lesson Page</div>} />
+//           <Route path="add-quiz" element={<div>Add Quiz Page</div>} />
+//           <Route path="edit-lesson" element={<div>Edit Lesson Page</div>} />
+//           <Route path="add-book" element={<div>Add Book Page</div>} />
+//           <Route path="add-article" element={<div>Add Article Page</div>} />
+//           <Route path="edit-profile" element={<div>Edit Profile Page</div>} />
 
-//             {/* Books */}
-//             <Route path="books" element={<AllBook />} />
-//             <Route path="books/create" element={<CreateBook />} />
-//             <Route path="books/:id/edit" element={<CreateBook />} />
+//         </Route> */}
+//       </Route>
 
-//             {/* Blogs */}
-//             <Route path="blogs" element={<AllBlogs />} />
-//             <Route path="blogs/create" element={<CreateBlog />} />
-//             <Route path="blogs/:id/edit" element={<CreateBlog />} />
-//           </Route>
+//       <Route path="*" element={<NotFound />} />
 
-//           {/* ===== STUDENT ROUTES ===== */}
-//           <Route
-//             path="/student"
-//             element={
-//               <ProtectedRoute roles={["student"]}>
-//                 <StudentDashboard />
-//               </ProtectedRoute>
-//             }
-//           >
-//             <Route path="profile" element={<Profile />} />
-//             <Route path="my-courses" element={<MyCourses />} />
-//             <Route path="my-courses/:courseId" element={<CourseDetail />} />
-
-//             {/* Students can also create blogs */}
-//             <Route path="blogs/create" element={<CreateBlog />} />
-//             <Route path="blogs/:id/edit" element={<CreateBlog />} />
-//           </Route>
-
-//           {/* ===== SHARED PROTECTED (teacher + student) ===== */}
-//           {/* e.g. shared profile fallback if needed */}
-
-//           {/* ===== PUBLIC ===== */}
-//           <Route path="/unauthorized" element={<Unauthorized />} />
-//           <Route path="*" element={<NotFound />} />
-//         </Route>
-
-//         {/* Auth — outside RootLayout (no navbar/footer) */}
-//         <Route path="/login" element={<Login />} />
-//         <Route path="/register" element={<Register />} />
-//       </Routes>
-//     </BrowserRouter>
+//     </Routes>
 //   );
 // }
 

@@ -1,8 +1,5 @@
 import { useState, useEffect, useRef } from "react"
 
-/* ─────────────────────────────────────
-   COURSE DATA  (per-course overrides)
-───────────────────────────────────── */
 const COURSE_DATA = {
   1: {
     title:      "Variables & Data",

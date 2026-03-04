@@ -1,74 +1,60 @@
-import { apiSlice } from "../api/apiSlice";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQuery } from "../baseQuery"; // 👈 adjust path if needed
 
-export const blogsApi = apiSlice.injectEndpoints({
-  endpoints: (build) => ({
+export const blogApi = createApi({
+  reducerPath: "blogApi",
+  baseQuery,
+  tagTypes: ["Blog"],
+  endpoints: (builder) => ({
 
-    getAllBlogs: build.query({
-      query: ({ page = 1, limit = 10, search, tag } = {}) => ({
-        url: "/blogs/",
-        params: {
-          page,
-          limit,
-          ...(search && { search }),
-          ...(tag    && { tag }),
-        },
-      }),
-      providesTags: (result) =>
-        result
-          ? [
-              ...(Array.isArray(result) ? result : result.blogs ?? []).map(
-                ({ id }) => ({ type: "Blog", id })
-              ),
-              { type: "Blog", id: "LIST" },
-            ]
-          : [{ type: "Blog", id: "LIST" }],
+    // GET /blogs?limit=5  — list all blogs (params forwarded)
+    getBlogs: builder.query({
+      query: (params) => ({ url: "/blogs/", params }),
+      providesTags: ["Blog"],
     }),
 
-    // ✅ Fetch a single blog by ID — used by the edit form
-    getBlogById: build.query({
-      query: (id) => `/blogs/${id}/`,
-      providesTags: (result, error, id) => [{ type: "Blog", id }],
+    // GET /blogs/:id  — single blog (used when editing)
+    getBlogById: builder.query({
+      query: (id) => `/blogs/${id}`,
+      providesTags: (_res, _err, id) => [{ type: "Blog", id }],
     }),
 
-    createBlog: build.mutation({
+    // POST /blogs
+    createBlog: builder.mutation({
       query: (body) => ({
         url: "/blogs/",
         method: "POST",
         body,
       }),
-      invalidatesTags: [{ type: "Blog", id: "LIST" }],
+      invalidatesTags: ["Blog"],
     }),
 
-    updateBlog: build.mutation({
-      query: ({ id, ...data }) => ({
-        url: `/blogs/${id}/`,
-        method: "PATCH",
-        body: data,
+    // PUT /blogs/:id
+    updateBlog: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/blogs/${id}`,
+        method: "PUT",
+        body,
       }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: "Blog", id },
-        { type: "Blog", id: "LIST" },
-      ],
+      invalidatesTags: (_res, _err, { id }) => [{ type: "Blog", id }, "Blog"],
     }),
 
-    deleteBlog: build.mutation({
+    // DELETE /blogs/:id
+    deleteBlog: builder.mutation({
       query: (id) => ({
-        url: `/blogs/${id}/`,
+        url: `/blogs/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, id) => [
-        { type: "Blog", id },
-        { type: "Blog", id: "LIST" },
-      ],
+      invalidatesTags: ["Blog"],
     }),
 
   }),
 });
 
 export const {
-  useGetAllBlogsQuery,
-  useGetBlogByIdQuery,     // ✅ used by CreateBlog edit mode
+  useGetBlogsQuery,
+  useGetBlogByIdQuery,
   useCreateBlogMutation,
   useUpdateBlogMutation,
   useDeleteBlogMutation,
-} = blogsApi;
+} = blogApi;
