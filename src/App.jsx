@@ -128,6 +128,9 @@ import MyBook from "./components/ui/MyBook";
 import AllBooks from "./components/teacher/AllBooks";
 import BookDetail from "./pages/book/BookDetail";
 import EditBook from "./pages/book/EditBook";
+import MyProgress from "./pages/course/MyProgress";
+import CoursePlayer from "./pages/course/CoursePlayer";
+import StudentDashboard from "./pages/student/StudentDashboard";
 
 function App() {
   const dispatch = useDispatch();
@@ -179,6 +182,10 @@ function App() {
         <Route path="/blogs/:id" element={<BlogDetail />} />
         <Route path="/profile/all-books" element={<AllBooks/>} />
         <Route path="/books/:id" element={<BookDetail />} />
+        <Route path="/my-progress" element={<MyProgress />} />
+        <Route path="/courses/:id/play"element={<CoursePlayer />} />
+        {/* <Route path="/student"element={<StudentDashboard />} /> */}
+
       </Route>
 
       <Route path="/login" element={<Login />} />
