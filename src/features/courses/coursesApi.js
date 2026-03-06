@@ -272,12 +272,21 @@ export const coursesApi = createApi({
       providesTags: ["Enrollment"],
     }),
 
-    // POST /courses/enroll  body: { course_id: 3 }
+    // // POST /courses/enroll  body: { course_id: 3 }
+    // enrollCourse: builder.mutation({
+    //   query: (courseId) => ({
+    //     url: "/courses/enroll",
+    //     method: "POST",
+    //     body: { course_id: courseId },
+    //   }),
+    //   invalidatesTags: ["Enrollment", "Course"],
+    // }),
+
+    // POST /courses/{course_id}/enroll  ← FIXED (was /courses/enroll)
     enrollCourse: builder.mutation({
       query: (courseId) => ({
-        url: "/courses/enroll",
+        url:    `/courses/${courseId}/enroll`,
         method: "POST",
-        body: { course_id: courseId },
       }),
       invalidatesTags: ["Enrollment", "Course"],
     }),

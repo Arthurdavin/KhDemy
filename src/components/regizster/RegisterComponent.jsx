@@ -252,7 +252,10 @@ const registerSchema = z.object({
   fullName: z.string().min(1, "Full name is required"),
   username: z.string().min(1, "Username is required"),
   email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter"),
   dob: z.string().min(1, "Date of birth is required"),
   gender: z.enum(["male", "female"], { required_error: "Gender is required" }),
   role: z.enum(["student", "teacher"]).optional(),
@@ -296,49 +299,54 @@ export default function RegisterComponent() {
       return;
     }
     try {
-      await register({
+      const payload = {
         full_name: form.fullName,
         username: form.username,
         email: form.email,
         password: form.password,
-        date_of_birth: form.dob,
+        date_of_birth: form.dob || null,
         gender: form.gender,
         role: form.role || "student",
-        profile_url: form.portfolio || "",
-        bio: "",
-        address: "",
-        phone_number: "",
-      }).unwrap();
+        profile_url: form.portfolio || "",  // backend requires string, not null
+        bio: "",                            // backend requires string, not null
+        address: "",                        // backend requires string, not null
+        phone_number: "",                   // backend requires string, not null
+      };
+
+      await register(payload).unwrap();
       toast.success("Account created successfully!");
       navigate("/login");
     } catch (err) {
-      toast.error(err?.data?.detail || "Registration failed. Please try again.");
+      const errData = err?.data;
+      if (errData?.errors?.length) {
+        const raw = errData.errors[0]?.message || "Registration failed.";
+        const clean = raw.includes(": ") ? raw.split(": ").slice(1).join(": ") : raw;
+        toast.error(clean);
+      } else {
+        toast.error(errData?.message || errData?.detail || "Registration failed. Please try again.");
+      }
     }
   };
 
   return (
     <div className="h-screen w-screen flex overflow-hidden">
 
-      {/* ── LEFT PANEL ── */}
+      {/* LEFT PANEL */}
       <div
         className="hidden lg:flex w-[42%] flex-col items-center justify-center relative"
         style={{ background: "linear-gradient(145deg, #0f2044 0%, #1a3a6b 100%)" }}
       >
-        {/* Decorative blobs */}
         <div className="absolute top-16 left-12 w-40 h-40 rounded-full opacity-10"
           style={{ background: "radial-gradient(circle, #4a90e2, transparent)" }} />
         <div className="absolute bottom-24 right-10 w-56 h-56 rounded-full opacity-10"
           style={{ background: "radial-gradient(circle, #4a90e2, transparent)" }} />
 
-        {/* Content */}
         <div className="relative z-10 flex flex-col items-center gap-6 px-10">
-          {/* Logo text */}
           <div className="text-center">
             <span className="text-3xl font-black text-white tracking-tight">KH</span>
             <span className="text-3xl font-black text-red-400 tracking-tight">demy</span>
           </div>
 
-          {/* Illustration image */}
           <div className="w-64 h-64 rounded-2xl overflow-hidden shadow-2xl border border-white/10">
             <img
               src="https://www.allen.ac.in/apps2627/assets/images/reset-password.jpg"
@@ -352,7 +360,6 @@ export default function RegisterComponent() {
           </p>
         </div>
 
-        {/* Bottom sign-in link */}
         <p className="absolute bottom-8 text-white/30 text-xs">
           Already have an account?{" "}
           <Link to="/login" className="text-blue-400 hover:text-blue-300 font-semibold underline underline-offset-2">
@@ -361,11 +368,10 @@ export default function RegisterComponent() {
         </p>
       </div>
 
-      {/* ── RIGHT PANEL ── */}
+      {/* RIGHT PANEL */}
       <div className="flex-1 flex items-center justify-center bg-white px-10">
         <div className="w-full max-w-md">
 
-          {/* Heading */}
           <div className="mb-6">
             <p className="text-xs tracking-[0.25em] text-blue-500 font-semibold uppercase mb-1">
               Welcome to KHdemy
@@ -417,7 +423,7 @@ export default function RegisterComponent() {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"} name="password"
-                  placeholder="Min. 8 characters" value={form.password} onChange={handleChange}
+                  placeholder="Min. 8 chars, one uppercase" value={form.password} onChange={handleChange}
                   className={`${inputBase} pr-14 ${errors.password ? "border-red-400" : ""}`}
                 />
                 <button
