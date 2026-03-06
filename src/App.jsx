@@ -108,7 +108,6 @@ import CoursesPage from "./pages/course/Courses";
 import Login from "./pages/login/Login";
 import Registration from "./pages/register/Register";
 
-import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Homepage";
 import TeacherDashboard from "./components/teacher/TeacherDashboard";
 import CreateCourse from "./pages/course/CreateCourse";
@@ -123,14 +122,12 @@ import AllBook from "./pages/book/AllBook";
 import CreateLesson from "./pages/lesson/CreateLesson";
 import BlogDetail from "./pages/blog/BlogDetail";
 import EditBlogForm from "./pages/blog/EditBlogForm";
-import MyAllBlogs from "./components/ui/MyAllArticle";
-import MyBook from "./components/ui/MyBook";
 import AllBooks from "./components/teacher/AllBooks";
 import BookDetail from "./pages/book/BookDetail";
 import EditBook from "./pages/book/EditBook";
 import MyProgress from "./pages/course/MyProgress";
 import CoursePlayer from "./pages/course/CoursePlayer";
-import StudentDashboard from "./pages/student/StudentDashboard";
+
 
 function App() {
   const dispatch = useDispatch();
