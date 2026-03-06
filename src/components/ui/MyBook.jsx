@@ -1,62 +1,86 @@
-// // components/MyBook.jsx
-// import { useState, useEffect } from "react";
-// import { fetchBooks } from "../../features/data/api";
 import { useNavigate } from "react-router-dom";
-import { MediaThumb, SectionHeader, SmallAvatar } from "./Profile";
-import { useGetBooksQuery } from "../../features/books/booksAPI";
+import { useGetOwnerBooksQuery } from "../../features/books/booksAPI";
+import { SectionHeader } from "./Profile";
+import { useSelector } from "react-redux";
+
+const COLORS = [
+  "from-indigo-400 to-purple-500",
+  "from-blue-500 to-cyan-500",
+  "from-pink-400 to-rose-500",
+  "from-amber-400 to-orange-500",
+  "from-emerald-400 to-teal-500",
+  "from-violet-400 to-indigo-500",
+];
 
 const SkeletonRow = () => (
-  <div className="flex items-center gap-5 py-4 animate-pulse">
-    <div className="w-24 h-16 rounded-lg bg-gray-100 flex-shrink-0" />
-    <div className="flex-1 space-y-2">
-      <div className="h-3 w-48 bg-gray-100 rounded" />
-      <div className="h-2 w-64 bg-gray-100 rounded" />
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-gray-100" />
-        <div className="h-2 w-16 bg-gray-100 rounded" />
+  <div className="flex items-center justify-between py-4 px-2 animate-pulse">
+    <div className="flex items-center gap-4">
+      <div className="w-14 h-10 rounded-lg bg-gray-100 flex-shrink-0" />
+      <div className="space-y-2">
+        <div className="h-3 w-40 bg-gray-100 rounded" />
+        <div className="h-2 w-24 bg-gray-100 rounded" />
       </div>
     </div>
+    <div className="h-3 w-16 bg-gray-100 rounded" />
   </div>
 );
 
-const BookRow = ({ book, idx }) => (
-  <div className="flex items-center gap-5 py-4 rounded-xl transition-colors duration-150 hover:bg-slate-50">
-    {book.thumbnail_url ? (
-      <img
-        src={book.thumbnail_url}
-        alt={book.title}
-        className="w-24 h-16 rounded-lg object-cover flex-shrink-0 shadow"
-      />
-    ) : (
-      <MediaThumb idx={idx + 1} />
-    )}
-    <div className="flex-1 min-w-0">
-      <p className="text-base font-bold text-gray-800 truncate">{book.title}</p>
-      <p className="text-sm text-gray-400 truncate mb-2">{book.desc}</p>
-      <div className="flex items-center gap-2">
-        <SmallAvatar />
-        <span className="text-sm text-gray-500 font-medium">{book.author}</span>
+const BookRow = ({ book, color }) => {
+  // categories is always an array of objects { id, name } after normaliseItem
+  const categoryName = book.categories?.[0]?.name ?? "General";
+
+  return (
+    <div className="flex items-center justify-between py-4 px-2 rounded-xl
+      transition-colors duration-150 hover:bg-slate-50">
+      <div className="flex items-center gap-4">
+        {book.thumbnail ? (
+          <img
+            src={book.thumbnail}
+            alt={book.title}
+            className="w-14 h-10 rounded-lg object-cover flex-shrink-0 shadow-sm"
+          />
+        ) : (
+          <div className={`w-14 h-10 rounded-lg bg-gradient-to-r ${color} flex-shrink-0`} />
+        )}
+        <div>
+          <p className="text-base font-bold text-gray-800 line-clamp-1">{book.title}</p>
+          <span className="text-sm text-gray-400">{categoryName}</span>
+        </div>
       </div>
+      <span className="text-sm text-gray-500 font-medium truncate max-w-[120px] text-right">
+        {book.author ?? "—"}
+      </span>
     </div>
-  </div>
-);
+  );
+};
 
 export default function MyBook() {
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useGetBooksQuery({ limit: 3 });
+  const user     = useSelector((state) => state.auth.user);
 
-  const books = (
-    Array.isArray(data) ? data : data?.books ?? data?.data ?? data?.results ?? []
-  ).slice(0, 3);
+  const { data, isLoading, isError } = useGetOwnerBooksQuery(
+    { owner_id: user?.id, page: 1, limit: 3 },
+    { skip: !user?.id }
+  );
+
+  // data is { total, page, limit, total_pages, items: BookItem[] }
+  const books = data?.items?.slice(0, 3) ?? [];
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-7">
+    <div className="bg-white rounded-2xl shadow-sm p-7 mb-6">
+
       <SectionHeader
         title="Book"
         highlight="My"
         linkLabel="See All Books"
         onLink={() => navigate("/profile/all-books")}
       />
+
+      {/* Column labels */}
+      <div className="flex justify-between text-xs text-gray-400 font-semibold mb-1 px-2 uppercase tracking-widest">
+        <span>Book Name</span>
+        <span>Author</span>
+      </div>
 
       {isError && (
         <p className="text-xs text-red-400 py-3 text-center">Failed to load books.</p>
@@ -65,9 +89,16 @@ export default function MyBook() {
       <div className="divide-y divide-gray-50">
         {isLoading
           ? Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)
-          : books.map((book, idx) => (
-              <BookRow key={book.id} book={book} idx={idx} />
-            ))}
+          : books.length === 0
+            ? <p className="text-xs text-gray-400 py-6 text-center">No books yet.</p>
+            : books.map((book, i) => (
+                <BookRow
+                  key={book.id}
+                  book={book}
+                  color={COLORS[i % COLORS.length]}
+                />
+              ))
+        }
       </div>
     </div>
   );

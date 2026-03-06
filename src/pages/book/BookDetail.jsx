@@ -1,122 +1,528 @@
-import React from 'react';
-import { Facebook, Send, Youtube, Instagram, Moon } from 'lucide-react';
+import { useState, useEffect } from "react"
+import { Link, useParams, useNavigate } from "react-router-dom"
+import { ChevronRight, ArrowLeft, Loader2 } from "lucide-react"
+import { useGetBookByIdQuery, useGetBooksQuery } from "../../features/books/booksAPI"
+import { useGetTeacherInfoQuery } from "../../features/users/userSlice"
+import BookDetailsPdf from "./BookDetailsPdf"
 
-const KhDemyPage = () => {
+// ── Related Book Card — matches BookCard style ────────────────────────────────
+const RelatedCard = ({ book }) => {
+  const navigate                    = useNavigate()
+  const [bookmarked, setBookmarked] = useState(false)
+
+  const thumb    = book.thumbnail ?? book.thumbnail_url ?? null
+  const author   = book.author ?? book.author_name ?? null
+  const category = book.categories?.[0]?.name ?? book.category ?? null
+
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-800">
-      {/* --- Navigation Bar --- */}
-      <nav className="flex items-center justify-between px-12 py-4 border-b">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-blue-900 rounded-lg flex items-center justify-center text-white font-bold">KH</div>
-        </div>
-        
-        <div className="flex items-center gap-8 text-sm font-medium">
-          <a href="#" className="hover:text-blue-600">Courses</a>
-          <a href="#" className="hover:text-blue-600 border-b-2 border-blue-600 pb-1">Library</a>
-          <a href="#" className="hover:text-blue-600">Blog</a>
-          <a href="#" className="hover:text-blue-600">About Us</a>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Moon size={20} className="cursor-pointer" />
-          <button className="bg-blue-900 text-white px-6 py-2 rounded-md text-sm">Login</button>
-        </div>
-      </nav>
-
-      {/* --- Main Content Section --- */}
-      <main className="max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-        {/* Book Cover Image */}
-        <div className="flex justify-center md:justify-end">
-          <div className="w-80 shadow-2xl rounded-sm overflow-hidden border">
-            <img 
-              src="/api/placeholder/400/600" 
-              alt="C Programming Book" 
-              className="w-full h-auto"
-            />
+    <div
+      onClick={() => navigate(`/books/${book.id}`)}
+      className="flex flex-row gap-3 rounded-xl p-3 shadow-md border border-gray-100
+        dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer
+        w-full h-[180px] mb-4 bg-white dark:bg-gray-800"
+    >
+      {/* Book Cover */}
+      <div className="shrink-0 w-[120px] h-full rounded-lg overflow-hidden shadow-sm bg-gray-100 dark:bg-gray-700">
+        {thumb ? (
+          <img
+            src={thumb}
+            alt={book.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-blue-100 to-indigo-100
+            dark:from-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center">
+            <span className="text-4xl">📚</span>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Book Details */}
-        <div className="flex flex-col gap-4">
-          <h1 className="text-4xl font-bold">C Programming</h1>
-          <p className="text-gray-500 text-sm italic">by Fiersa Besari</p>
-          <p className="text-gray-400 text-xs">3.7M read</p>
-          
-          <h2 className="text-blue-800 font-bold text-lg mt-2">Description</h2>
-          <p className="text-gray-600 leading-relaxed text-sm">
-            C is a powerful and versatile language widely used for system software, embedded systems, 
-            and general applications. It provides important features such as data types, operators, 
-            control structures, and functions to create efficient and well-structured programs. 
-            With pointers and memory management, C is essential for building operating systems, 
-            compilers, and other high-performance tools.
+      {/* Content */}
+      <div className="flex flex-col flex-1 gap-1.5 relative overflow-hidden py-1 min-w-0">
+        {/* Category Badge */}
+        {category && (
+          <span className="w-fit bg-purple-100 text-purple-500 text-xs font-semibold px-2 py-0.5 rounded-full">
+            {category}
+          </span>
+        )}
+
+        {/* Title */}
+        <h4 className="text-gray-900 dark:text-white font-bold text-sm leading-tight line-clamp-2">
+          {book.title}
+        </h4>
+
+        {/* Author */}
+        {author && (
+          <p className="text-xs text-gray-500 dark:text-gray-400">by {author}</p>
+        )}
+
+        {/* Description */}
+        {book.description && (
+          <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed line-clamp-3">
+            {book.description}
           </p>
-          
-          <button className="mt-8 bg-blue-900 text-white w-24 py-2 rounded flex items-center justify-center gap-2 text-sm hover:bg-blue-800 transition">
-            <span>←</span> Back
-          </button>
+        )}
+
+        {/* Bookmark Icon */}
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            setBookmarked((b) => !b)
+          }}
+          className="absolute bottom-0 right-0 p-1 transition-transform duration-150 hover:scale-110"
+          title={bookmarked ? "Remove bookmark" : "Bookmark"}
+        >
+          <svg
+            className={`w-5 h-5 transition-colors duration-200 ${
+              bookmarked ? "fill-[#1e2a6e] stroke-[#1e2a6e]" : "fill-none stroke-gray-400"
+            }`}
+            strokeWidth="1.8"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 3h14a1 1 0 0 1 1 1v17l-8-4-8 4V4a1 1 0 0 1 1-1z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+export default function BookDetail() {
+  const { id }   = useParams()
+  const navigate = useNavigate()
+
+  // ── Fetch the book ─────────────────────────────────────────────────────────
+  const {
+    data: book,
+    isLoading: bookLoading,
+    isError,
+  } = useGetBookByIdQuery(id)
+
+  // ── Fetch author info ──────────────────────────────────────────────────────
+  const {
+    data: authorData,
+    isLoading: authorLoading,
+  } = useGetTeacherInfoQuery(book?.author_id, {
+    skip: !book?.author_id,
+  })
+
+  const authorName   = authorData?.full_name   ?? "Unknown Author"
+  const authorAvatar = authorData?.profile_url ?? null
+
+  // ── Related books ──────────────────────────────────────────────────────────
+  const { data: relatedRaw } = useGetBooksQuery(
+    { page: 1, limit: 20 },
+    { skip: !book }
+  )
+
+  const [relatedBooks, setRelatedBooks] = useState([])
+
+  useEffect(() => {
+    if (!book || !relatedRaw) { setRelatedBooks([]); return }
+
+    const allBooks = Array.isArray(relatedRaw)
+      ? relatedRaw
+      : relatedRaw?.items ?? relatedRaw?.data ?? relatedRaw?.books ?? []
+
+    const currentCatIds = new Set(
+      (book.category_ids ?? []).map((id) => String(id))
+    )
+
+    if (currentCatIds.size === 0) {
+      setRelatedBooks(allBooks.filter((b) => String(b.id) !== String(book.id)).slice(0, 5))
+      return
+    }
+
+    const filtered = allBooks.filter((b) => {
+      if (String(b.id) === String(book.id)) return false
+      return (b.category_ids ?? []).some((id) => currentCatIds.has(String(id)))
+    })
+
+    setRelatedBooks(filtered.slice(0, 5))
+  }, [book, relatedRaw])
+
+  // ── Loading ────────────────────────────────────────────────────────────────
+  if (bookLoading || authorLoading) return (
+    <div className="fixed inset-0 flex justify-center items-center bg-white dark:bg-gray-900 z-50">
+      <div className="flex flex-col items-center gap-3">
+        <Loader2 className="animate-spin text-blue-500" size={48} />
+        <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Loading…</p>
+      </div>
+    </div>
+  )
+
+  if (isError) return (
+    <p className="text-center mt-10 text-red-500 font-medium">
+      Failed to load book. Please try again.
+    </p>
+  )
+
+  if (!book) return (
+    <p className="text-center mt-10 text-gray-500">Book not found.</p>
+  )
+
+  const thumb        = book.thumbnail ?? book.thumbnail_url ?? null
+  const categoryName = book.categories?.[0]?.name ?? null
+
+  return (
+    <div className="bg-white dark:bg-gray-900 min-h-screen py-8 px-6 md:px-10">
+      <div className="max-w-6xl mx-auto">
+
+        {/* ── Breadcrumb ── */}
+        <div className="mb-8 flex items-center gap-2 text-sm flex-wrap">
+          <Link to="/library"
+            className="text-blue-700 dark:text-blue-400 hover:underline font-medium">
+            Library
+          </Link>
+          <ChevronRight size={14} className="text-gray-400" />
+          {categoryName && (
+            <>
+              <span className="text-blue-700 dark:text-blue-400 font-medium">{categoryName}</span>
+              <ChevronRight size={14} className="text-gray-400" />
+            </>
+          )}
+          <span className="text-amber-500 font-medium truncate max-w-[240px]">{book.title}</span>
         </div>
-      </main>
 
-      {/* --- Footer Section --- */}
-      <footer className="border-t mt-20 py-12 px-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-          
-          {/* Organized By */}
-          <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4 text-gray-700">Organized by</h3>
-            <div className="flex flex-col items-center md:items-start gap-4">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center border-2 border-blue-900">
-                <span className="text-[10px] text-center font-bold text-blue-900">ISTAD</span>
-              </div>
-              <p className="text-xs text-gray-500">Institute of Science and Techology <br/> Advanced Development</p>
+        {/* ── Back button ── */}
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full
+            bg-blue-900 text-white text-sm font-semibold
+            hover:bg-blue-800 transition mb-10 shadow-sm"
+        >
+          <ArrowLeft size={14} /> Back
+        </button>
+
+        {/* ── Two-column grid ── */}
+        <div className="grid grid-cols-12 gap-12">
+
+          {/* ════ LEFT — 7 cols ════ */}
+          <div className="col-span-12 lg:col-span-7">
+
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white leading-tight mb-6">
+              {book.title}
+            </h1>
+
+            {/* Cover image */}
+            <div className="mb-6 w-[240px]">
+              {thumb ? (
+                <img
+                  src={thumb}
+                  alt={book.title}
+                  className="w-full rounded-lg object-cover shadow-md border border-gray-100 dark:border-gray-700"
+                />
+              ) : (
+                <div className="w-full aspect-[3/4] rounded-lg bg-gradient-to-br
+                  from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30
+                  flex items-center justify-center shadow-md">
+                  <span className="text-6xl">📚</span>
+                </div>
+              )}
             </div>
-          </div>
 
-          {/* KhDemy Info */}
-          <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4 text-gray-700">KhDemy</h3>
-            <div className="flex flex-col items-center md:items-start gap-4">
-              <div className="text-3xl font-bold text-blue-900">KH</div>
-              <p className="text-xs text-gray-500 leading-tight">
-                Where Industry Experts Build <br/> Tomorrow's Innovators.
+            {/* Author */}
+            <div className="flex items-center gap-2 mb-1">
+              {authorAvatar ? (
+                <img src={authorAvatar} alt={authorName}
+                  className="w-7 h-7 rounded-full object-cover border border-gray-200" />
+              ) : null}
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                by <span className="font-semibold text-gray-700 dark:text-gray-300">{authorName}</span>
               </p>
             </div>
+
+            {/* Upload date */}
+            {book.uploaded_at && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-8">
+                {new Date(book.uploaded_at).toLocaleDateString("en-US", {
+                  year: "numeric", month: "long", day: "numeric",
+                })}
+              </p>
+            )}
+
+            {/* Description */}
+            <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed mb-10">
+              {book.description || "No description available."}
+            </p>
+
+            {/* PDF Viewer */}
+            <BookDetailsPdf fileUrl={book.file_url} />
           </div>
 
-          {/* Explore Links */}
-          <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4 text-gray-700">Explore</h3>
-            <ul className="text-xs space-y-4 text-gray-500">
-              <li><a href="#" className="hover:underline">Course</a></li>
-              <li><a href="#" className="hover:underline">Library</a></li>
-              <li><a href="#" className="hover:underline">Blog</a></li>
-              <li><a href="#" className="hover:underline">About us</a></li>
-            </ul>
-          </div>
+          {/* ════ RIGHT — 5 cols ════ */}
+          <aside className="col-span-12 lg:col-span-5 pt-1">
+            <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
+              Related Books
+            </h2>
 
-          {/* Contact Us */}
-          <div className="text-center md:text-left">
-            <h3 className="font-semibold mb-4 text-gray-700">Contact us</h3>
-            <ul className="text-xs space-y-4 text-gray-500">
-              <li className="flex items-center gap-2 justify-center md:justify-start">
-                <Facebook size={16} /> Facebook
-              </li>
-              <li className="flex items-center gap-2 justify-center md:justify-start">
-                <Send size={16} /> Telegram
-              </li>
-              <li className="flex items-center gap-2 justify-center md:justify-start">
-                <Youtube size={16} /> YouTube
-              </li>
-              <li className="flex items-center gap-2 justify-center md:justify-start">
-                <Instagram size={16} /> Instagram
-              </li>
-            </ul>
-          </div>
-
+            {relatedBooks.length === 0 ? (
+              <p className="text-gray-400 dark:text-gray-500 text-sm pt-4">
+                No related books found.
+              </p>
+            ) : (
+              <div className="flex flex-col">
+                {relatedBooks.slice(0, 2).map((b) => (
+                  <RelatedCard key={b.id} book={b} />
+                ))}
+              </div>
+            )}
+          </aside>
         </div>
-      </footer>
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default KhDemyPage;
+// import { useState, useEffect } from "react"
+// import { Link, useParams, useNavigate } from "react-router-dom"
+// import { ChevronRight, ArrowLeft, Loader2 } from "lucide-react"
+// import { useGetBookByIdQuery, useGetBooksQuery } from "../../features/books/booksAPI"
+// import { useGetTeacherInfoQuery } from "../../features/users/userSlice"
+// import BookDetailsPdf from "./BookDetailsPdf"
+
+// // ── Related Book Card — matches screenshot style ───────────────────────────────
+// const RelatedCard = ({ book }) => {
+//   const navigate = useNavigate()
+//   const thumb    = book.thumbnail ?? book.thumbnail_url ?? null
+//   const author   = book.author ?? book.author_name ?? null
+
+//   return (
+//     <div
+//       onClick={() => navigate(`/books/${book.id}`)}
+//       className="flex gap-4 cursor-pointer group py-5 border-b border-gray-100
+//         dark:border-gray-700/50 last:border-0"
+//     >
+//       {/* Portrait thumbnail */}
+//       <div className="flex-shrink-0 w-[70px] h-[95px] rounded overflow-hidden
+//         bg-gray-100 dark:bg-gray-700 shadow-sm">
+//         {thumb ? (
+//           <img
+//             src={thumb}
+//             alt={book.title}
+//             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+//           />
+//         ) : (
+//           <div className="w-full h-full bg-gradient-to-br from-blue-100 to-indigo-100
+//             dark:from-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center">
+//             <span className="text-2xl">📚</span>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* Info */}
+//       <div className="flex-1 min-w-0">
+//         <h4 className="text-sm font-bold text-gray-900 dark:text-white leading-snug mb-1
+//           group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+//           {book.title}
+//         </h4>
+//         {author && (
+//           <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+//             By {author}
+//           </p>
+//         )}
+//         {book.description && (
+//           <p className="text-xs text-gray-400 dark:text-gray-500 line-clamp-3 leading-relaxed">
+//             {book.description}
+//           </p>
+//         )}
+//       </div>
+//     </div>
+//   )
+// }
+
+// // ── Main ──────────────────────────────────────────────────────────────────────
+// export default function BookDetail() {
+//   const { id }   = useParams()
+//   const navigate = useNavigate()
+
+//   // ── Fetch the book ─────────────────────────────────────────────────────────
+//   const {
+//     data: book,
+//     isLoading: bookLoading,
+//     isError,
+//   } = useGetBookByIdQuery(id)
+
+//   // ── Fetch author info ──────────────────────────────────────────────────────
+//   const {
+//     data: authorData,
+//     isLoading: authorLoading,
+//   } = useGetTeacherInfoQuery(book?.author_id, {
+//     skip: !book?.author_id,
+//   })
+
+//   const authorName   = authorData?.full_name   ?? "Unknown Author"
+//   const authorAvatar = authorData?.profile_url ?? null
+
+//   // ── Related books ──────────────────────────────────────────────────────────
+//   const { data: relatedRaw } = useGetBooksQuery(
+//     { page: 1, limit: 20 },
+//     { skip: !book }
+//   )
+
+//   const [relatedBooks, setRelatedBooks] = useState([])
+
+//   useEffect(() => {
+//     if (!book || !relatedRaw) { setRelatedBooks([]); return }
+
+//     const allBooks = Array.isArray(relatedRaw)
+//       ? relatedRaw
+//       : relatedRaw?.items ?? relatedRaw?.data ?? relatedRaw?.books ?? []
+
+//     const currentCatIds = new Set(
+//       (book.category_ids ?? []).map((id) => String(id))
+//     )
+
+//     if (currentCatIds.size === 0) {
+//       setRelatedBooks(allBooks.filter((b) => String(b.id) !== String(book.id)).slice(0, 5))
+//       return
+//     }
+
+//     const filtered = allBooks.filter((b) => {
+//       if (String(b.id) === String(book.id)) return false
+//       return (b.category_ids ?? []).some((id) => currentCatIds.has(String(id)))
+//     })
+
+//     setRelatedBooks(filtered.slice(0, 5))
+//   }, [book, relatedRaw])
+
+//   // ── Loading ────────────────────────────────────────────────────────────────
+//   if (bookLoading || authorLoading) return (
+//     <div className="fixed inset-0 flex justify-center items-center bg-white dark:bg-gray-900 z-50">
+//       <div className="flex flex-col items-center gap-3">
+//         <Loader2 className="animate-spin text-blue-500" size={48} />
+//         <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Loading…</p>
+//       </div>
+//     </div>
+//   )
+
+//   if (isError) return (
+//     <p className="text-center mt-10 text-red-500 font-medium">
+//       Failed to load book. Please try again.
+//     </p>
+//   )
+
+//   if (!book) return (
+//     <p className="text-center mt-10 text-gray-500">Book not found.</p>
+//   )
+
+//   const thumb        = book.thumbnail ?? book.thumbnail_url ?? null
+//   const categoryName = book.categories?.[0]?.name ?? null
+
+//   return (
+//     <div className="bg-white dark:bg-gray-900 min-h-screen py-8 px-6 md:px-10">
+//       <div className="max-w-6xl mx-auto">
+
+//         {/* ── Breadcrumb ── */}
+//         <div className="mb-8 flex items-center gap-2 text-sm flex-wrap">
+//           <Link to="/library"
+//             className="text-blue-700 dark:text-blue-400 hover:underline font-medium">
+//             Library
+//           </Link>
+//           <ChevronRight size={14} className="text-gray-400" />
+//           {categoryName && (
+//             <>
+//               <span className="text-blue-700 dark:text-blue-400 font-medium">{categoryName}</span>
+//               <ChevronRight size={14} className="text-gray-400" />
+//             </>
+//           )}
+//           <span className="text-amber-500 font-medium truncate max-w-[240px]">{book.title}</span>
+//         </div>
+
+//         {/* ── Back button ── */}
+//         <button
+//           onClick={() => navigate(-1)}
+//           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full
+//             bg-blue-900 text-white text-sm font-semibold
+//             hover:bg-blue-800 transition mb-10 shadow-sm"
+//         >
+//           <ArrowLeft size={14} /> Back
+//         </button>
+
+//         {/* ── Two-column grid ── */}
+//         <div className="grid grid-cols-12 gap-12">
+
+//           {/* ════ LEFT — 7 cols ════ */}
+//           <div className="col-span-12 lg:col-span-7">
+
+//             {/* Title */}
+//             <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white leading-tight mb-6">
+//               {book.title}
+//             </h1>
+
+//             {/* Cover image */}
+//             <div className="mb-6 w-[240px]">
+//               {thumb ? (
+//                 <img
+//                   src={thumb}
+//                   alt={book.title}
+//                   className="w-full rounded-lg object-cover shadow-md border border-gray-100 dark:border-gray-700"
+//                 />
+//               ) : (
+//                 <div className="w-full aspect-[3/4] rounded-lg bg-gradient-to-br
+//                   from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30
+//                   flex items-center justify-center shadow-md">
+//                   <span className="text-6xl">📚</span>
+//                 </div>
+//               )}
+//             </div>
+
+//             {/* Author */}
+//             <div className="flex items-center gap-2 mb-1">
+//               {authorAvatar ? (
+//                 <img src={authorAvatar} alt={authorName}
+//                   className="w-7 h-7 rounded-full object-cover border border-gray-200" />
+//               ) : null}
+//               <p className="text-sm text-gray-500 dark:text-gray-400">
+//                 by <span className="font-semibold text-gray-700 dark:text-gray-300">{authorName}</span>
+//               </p>
+//             </div>
+
+//             {/* Upload date */}
+//             {book.uploaded_at && (
+//               <p className="text-xs text-gray-400 dark:text-gray-500 mb-8">
+//                 {new Date(book.uploaded_at).toLocaleDateString("en-US", {
+//                   year: "numeric", month: "long", day: "numeric",
+//                 })}
+//               </p>
+//             )}
+
+//             {/* Description */}
+//             <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed mb-10">
+//               {book.description || "No description available."}
+//             </p>
+
+//             {/* PDF Viewer */}
+//             <BookDetailsPdf fileUrl={book.file_url} />
+//           </div>
+
+//           {/* ════ RIGHT — 5 cols ════ */}
+//           <aside className="col-span-12 lg:col-span-5 pt-1">
+//             <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">
+//               Related Books
+//             </h2>
+
+//             {relatedBooks.length === 0 ? (
+//               <p className="text-gray-400 dark:text-gray-500 text-sm pt-4">
+//                 No related books found.
+//               </p>
+//             ) : (
+//               <div className="flex flex-col">
+//                 {relatedBooks.slice(0, 3).map((b) => (
+//                   <RelatedCard key={b.id} book={b} />
+//                 ))}
+//               </div>
+//             )}
+//           </aside>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }

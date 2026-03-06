@@ -129,19 +129,23 @@
 //   useRemoveLessonMutation,
 // } = coursesApi;
 
-
-
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from "../baseQuery";
 
-const COLORS = ["#6366f1","#8b5cf6","#ec4899","#0ea5e9","#10b981","#f59e0b"];
+const COLORS = [
+  "#6366f1",
+  "#8b5cf6",
+  "#ec4899",
+  "#0ea5e9",
+  "#10b981",
+  "#f59e0b",
+];
 
 export const coursesApi = createApi({
   reducerPath: "coursesApi",
   baseQuery,
   tagTypes: ["Course", "Enrollment", "Progress"],
   endpoints: (builder) => ({
-
     // ─────────────────────────────────────────────────────────────────────
     // PUBLIC
     // ─────────────────────────────────────────────────────────────────────
@@ -155,11 +159,18 @@ export const coursesApi = createApi({
     }),
 
     // GET /courses/{id}  ← backend returns 405, use getTeacherCourses + find instead
+    // getCourseById: builder.query({
+    //   query: (id) => `/courses/${id}`,
+    //   providesTags: (_res, _err, id) => [{ type: "Course", id }],
+    // }),
+    
     getCourseById: builder.query({
-      query: (id) => `/courses/${id}`,
-      providesTags: (_res, _err, id) => [{ type: "Course", id }],
+      query: (id) => `/courses/?id=${id}`, // try this first
+      transformResponse: (res) => {
+        const list = Array.isArray(res) ? res : res?.courses ?? res?.data ?? [];
+        return list[0] ?? null;
+      },
     }),
-
     // ─────────────────────────────────────────────────────────────────────
     // TEACHER
     // ─────────────────────────────────────────────────────────────────────
@@ -168,21 +179,21 @@ export const coursesApi = createApi({
     getTeacherCourses: builder.query({
       query: () => "/courses/get-own-course",
       transformResponse: (res) => {
-        const list = Array.isArray(res) ? res : res?.courses ?? res?.data ?? []
+        const list = Array.isArray(res) ? res : res?.courses ?? res?.data ?? [];
         return list.map((c, i) => ({
-          id:            c.id,
-          title:         c.title          ?? "",
-          description:   c.description    ?? "",
-          category:      c.category?.name ?? c.category ?? "",
-          category_id:   c.category_id    ?? c.category?.id ?? null,
-          type:          c.is_paid        ? "Paid" : "Free",
-          students:      c.total_students ?? 0,
-          thumbnail_url: c.thumbnail_url  ?? c.thumbnail ?? null,
-          thumbnail:     c.thumbnail      ?? c.thumbnail_url ?? null,
-          color:         c.color          ?? COLORS[i % COLORS.length],
-          lessons:       c.lessons        ?? [],  // [{id,title,description,video_url,attachments}]
-          tags:          c.tags           ?? [],  // [{id,name}]
-        }))
+          id: c.id,
+          title: c.title ?? "",
+          description: c.description ?? "",
+          category: c.category?.name ?? c.category ?? "",
+          category_id: c.category_id ?? c.category?.id ?? null,
+          type: c.is_paid ? "Paid" : "Free",
+          students: c.total_students ?? 0,
+          thumbnail_url: c.thumbnail_url ?? c.thumbnail ?? null,
+          thumbnail: c.thumbnail ?? c.thumbnail_url ?? null,
+          color: c.color ?? COLORS[i % COLORS.length],
+          lessons: c.lessons ?? [], // [{id,title,description,video_url,attachments}]
+          tags: c.tags ?? [], // [{id,name}]
+        }));
       },
       providesTags: ["Course"],
     }),
@@ -190,7 +201,7 @@ export const coursesApi = createApi({
     // POST /courses
     createCourse: builder.mutation({
       query: (body) => ({
-        url:    "/courses",
+        url: "/courses/",
         method: "POST",
         body,
       }),
@@ -200,7 +211,7 @@ export const coursesApi = createApi({
     // PATCH /courses/{id}
     updateCourse: builder.mutation({
       query: ({ id, ...body }) => ({
-        url:    `/courses/${id}`,
+        url: `/courses/${id}`,
         method: "PATCH",
         body,
       }),
@@ -210,7 +221,7 @@ export const coursesApi = createApi({
     // DELETE /courses/{id}
     deleteCourse: builder.mutation({
       query: (id) => ({
-        url:    `/courses/${id}`,
+        url: `/courses/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Course"],
@@ -221,20 +232,42 @@ export const coursesApi = createApi({
     // ─────────────────────────────────────────────────────────────────────
 
     // GET /courses/get-enrolled-course
+    // getEnrolledCourses: builder.query({
+    //   query: () => "/courses/get-enrolled-course",
+    //   transformResponse: (res) => {
+    //     const list = Array.isArray(res) ? res : res?.courses ?? res?.data ?? [];
+    //     return list.map((c) => ({
+    //       id: c.id,
+    //       title: c.title ?? "",
+    //       description: c.description ?? "",
+    //       thumbnail_url: c.thumbnail_url ?? c.thumbnail ?? null,
+    //       category: c.category?.name ?? c.category ?? "",
+    //       type: c.is_paid ? "Paid" : "Free",
+    //       progress: c.progress ?? 0,
+    //       lessons: c.lessons ?? [],
+    //     }));
+    //   },
+    //   providesTags: ["Enrollment"],
+    // }),
+
     getEnrolledCourses: builder.query({
-      query: () => "/courses/get-enrolled-course",
+      query: () => "/courses/enrollments",
       transformResponse: (res) => {
-        const list = Array.isArray(res) ? res : res?.courses ?? res?.data ?? []
+        const list = Array.isArray(res) ? res : res?.courses ?? res?.data ?? [];
         return list.map((c) => ({
-          id:            c.id,
-          title:         c.title          ?? "",
-          description:   c.description    ?? "",
-          thumbnail_url: c.thumbnail_url  ?? c.thumbnail ?? null,
+          id:            c.course_id      ?? c.id,
+          title:         c.title         ?? "",
+          description:   c.description   ?? "",
+          thumbnail_url: c.thumbnail_url ?? c.thumbnail ?? null,
+          thumbnail:     c.thumbnail     ?? c.thumbnail_url ?? null,
           category:      c.category?.name ?? c.category ?? "",
-          type:          c.is_paid        ? "Paid" : "Free",
-          progress:      c.progress       ?? 0,
+          type:          c.is_paid ? "Paid" : "Free",
+          progress:      c.process_percentage ?? c.progress ?? 0,
+          is_completed:  c.is_completed   ?? false,
+          enrolled_at:   c.enrolled_at    ?? null,
+          enrollment_id: c.enrollment_id  ?? null,
           lessons:       c.lessons        ?? [],
-        }))
+        }));
       },
       providesTags: ["Enrollment"],
     }),
@@ -242,9 +275,9 @@ export const coursesApi = createApi({
     // POST /courses/enroll  body: { course_id: 3 }
     enrollCourse: builder.mutation({
       query: (courseId) => ({
-        url:    "/courses/enroll",
+        url: "/courses/enroll",
         method: "POST",
-        body:   { course_id: courseId },
+        body: { course_id: courseId },
       }),
       invalidatesTags: ["Enrollment", "Course"],
     }),
@@ -263,9 +296,9 @@ export const coursesApi = createApi({
     // body: [{ title, description, video_url }, ...]  ← array!
     addLessons: builder.mutation({
       query: ({ courseId, lessons }) => ({
-        url:    `/courses/${courseId}/lessons`,
+        url: `/courses/${courseId}/lessons`,
         method: "POST",
-        body:   lessons,   // send as array
+        body: lessons, // send as array
       }),
       invalidatesTags: ["Course"],
     }),
@@ -273,7 +306,7 @@ export const coursesApi = createApi({
     // DELETE /courses/{courseId}/lessons/{lessonId}
     removeLesson: builder.mutation({
       query: ({ courseId, lessonId }) => ({
-        url:    `/courses/${courseId}/lessons/${lessonId}`,
+        url: `/courses/${courseId}/lessons/${lessonId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Course"],
@@ -282,7 +315,7 @@ export const coursesApi = createApi({
     // POST /lessons/{lessonId}/complete  ← NOT /progress
     completeLesson: builder.mutation({
       query: (lessonId) => ({
-        url:    `/lessons/${lessonId}/complete`,
+        url: `/lessons/${lessonId}/complete`,
         method: "POST",
       }),
       invalidatesTags: ["Progress", "Enrollment"],
@@ -295,7 +328,7 @@ export const coursesApi = createApi({
     // POST /lessons/{lessonId}/attachments
     addAttachment: builder.mutation({
       query: ({ lessonId, ...body }) => ({
-        url:    `/lessons/${lessonId}/attachments`,
+        url: `/lessons/${lessonId}/attachments`,
         method: "POST",
         body,
       }),
@@ -305,7 +338,7 @@ export const coursesApi = createApi({
     // PUT /lessons/{lessonId}/attachments/{attachmentId}
     updateAttachment: builder.mutation({
       query: ({ lessonId, attachmentId, ...body }) => ({
-        url:    `/lessons/${lessonId}/attachments/${attachmentId}`,
+        url: `/lessons/${lessonId}/attachments/${attachmentId}`,
         method: "PUT",
         body,
       }),
@@ -315,38 +348,37 @@ export const coursesApi = createApi({
     // DELETE /lessons/{lessonId}/attachments/{attachmentId}
     deleteAttachment: builder.mutation({
       query: ({ lessonId, attachmentId }) => ({
-        url:    `/lessons/${lessonId}/attachments/${attachmentId}`,
+        url: `/lessons/${lessonId}/attachments/${attachmentId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Course"],
     }),
-
   }),
 });
 
 export const {
   // ── Public ──────────────────────────────────────────────
-  useGetCoursesQuery,              // GET /courses/
-  useGetCourseByIdQuery,           // GET /courses/{id}  (405 — use list+find)
+  useGetCoursesQuery, // GET /courses/
+  useGetCourseByIdQuery, // GET /courses/{id}  (405 — use list+find)
 
   // ── Teacher ─────────────────────────────────────────────
-  useGetTeacherCoursesQuery,       // GET /courses/get-own-course
-  useCreateCourseMutation,         // POST /courses
-  useUpdateCourseMutation,         // PATCH /courses/{id}
-  useDeleteCourseMutation,         // DELETE /courses/{id}
+  useGetTeacherCoursesQuery, // GET /courses/get-own-course
+  useCreateCourseMutation, // POST /courses
+  useUpdateCourseMutation, // PATCH /courses/{id}
+  useDeleteCourseMutation, // DELETE /courses/{id}
 
   // ── Student ─────────────────────────────────────────────
-  useGetEnrolledCoursesQuery,      // GET /courses/get-enrolled-course
-  useEnrollCourseMutation,         // POST /courses/enroll  { course_id }
-  useGetEnrollmentProgressQuery,   // GET /courses/enrollments-progress
+  useGetEnrolledCoursesQuery, // GET /courses/get-enrolled-course
+  useEnrollCourseMutation, // POST /courses/enroll  { course_id }
+  useGetEnrollmentProgressQuery, // GET /courses/enrollments-progress
 
   // ── Lessons ─────────────────────────────────────────────
-  useAddLessonsMutation,           // POST /courses/{id}/lessons  (array body)
-  useRemoveLessonMutation,         // DELETE /courses/{id}/lessons/{lid}
-  useCompleteLessonMutation,       // POST /lessons/{id}/complete
+  useAddLessonsMutation, // POST /courses/{id}/lessons  (array body)
+  useRemoveLessonMutation, // DELETE /courses/{id}/lessons/{lid}
+  useCompleteLessonMutation, // POST /lessons/{id}/complete
 
   // ── Attachments ─────────────────────────────────────────
-  useAddAttachmentMutation,        // POST /lessons/{id}/attachments
-  useUpdateAttachmentMutation,     // PUT  /lessons/{id}/attachments/{aid}
-  useDeleteAttachmentMutation,     // DELETE /lessons/{id}/attachments/{aid}
+  useAddAttachmentMutation, // POST /lessons/{id}/attachments
+  useUpdateAttachmentMutation, // PUT  /lessons/{id}/attachments/{aid}
+  useDeleteAttachmentMutation, // DELETE /lessons/{id}/attachments/{aid}
 } = coursesApi;

@@ -217,7 +217,7 @@ export default function AllCoursesTable() {
                       <div className="flex items-center gap-2 justify-end">
                         {/* View */}
                         <button
-                          onClick={() => navigate(`/teacher/courses/${course.id}`)}
+                          onClick={() => navigate(`/courses/${course.id}`)}
                           className="w-9 h-9 rounded-lg border-2 border-rose-200 bg-rose-50 flex items-center justify-center hover:bg-rose-100 hover:border-rose-300 transition-all"
                           title="View"
                         >

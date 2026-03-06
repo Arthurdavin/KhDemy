@@ -99,7 +99,7 @@ const navItems = [
   { icon: "❓", label: "Add Quiz",      path: "/teacher/add-quiz"      },
   { icon: "✏️", label: "Edit Lesson",  path: "/teacher/edit-lesson"   },
   { icon: "📚", label: "Add Book",      path: "/teacher/add-book"      },
-  { icon: "💬", label: "Add Article",  path: "/teacher/add-article"   },
+  { icon: "💬", label: "Add Article",  path: "/blogs/create"   },
 ]
 
 export default function Sidebar() {

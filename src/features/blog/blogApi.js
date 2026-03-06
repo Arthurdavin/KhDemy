@@ -6,12 +6,17 @@ export const blogApi = createApi({
   baseQuery,
   tagTypes: ["Blog"],
   endpoints: (builder) => ({
-
     // GET /blogs?limit=5  — list all blogs (params forwarded)
     getBlogs: builder.query({
       query: (params) => ({ url: "/blogs/", params }),
       providesTags: ["Blog"],
     }),
+    // getBlogs: builder.query({
+    //   query: (params = {}) => ({ url: "/blogs/", params }),
+    //   transformResponse: (res) =>
+    //     Array.isArray(res) ? res : res?.blogs ?? res?.data ?? [],
+    //   providesTags: ["Blog"],
+    // }),
 
     // GET /blogs/:id  — single blog (used when editing)
     getBlogById: builder.query({
@@ -47,7 +52,6 @@ export const blogApi = createApi({
       }),
       invalidatesTags: ["Blog"],
     }),
-
   }),
 });
 
