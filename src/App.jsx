@@ -9,7 +9,7 @@ const Home = lazy(() => import("./pages/Homepage"));
 const BlogPage = lazy(() => import("./pages/blog/BlogPage"));
 const NotFound = lazy(() => import("./components/home/NotFound"));
 const AboutUs = lazy(() => import("./pages/AboutUs"));
-const CoursesPage = lazy(() => import("./pages/course/Courses"));
+const CoursesPage = lazy(() => import("./pages/course/CoursePage"));
 const Login = lazy(() => import("./pages/login/Login"));
 const Registration = lazy(() => import("./pages/register/Register"));
 const TeacherDashboard = lazy(() => import("./components/teacher/TeacherDashboard"));
