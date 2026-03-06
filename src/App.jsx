@@ -1,40 +1,139 @@
-import { lazy, Suspense, useEffect } from "react";
+// import { Routes, Route } from "react-router-dom";
+// import RootLayout from "./layout/RootLayout";
+// import BlogPage from "./pages/blog/BlogPage";
+// import NotFound from "./components/home/NotFound";
+// import AboutUs from "./pages/AboutUs";
+// import CoursesPage from "./pages/course/Courses";
+// import Login from "./pages/login/Login";
+// import Registration from "./pages/register/Register";
+
+// import ProtectedRoute from "./components/ProtectedRoute";
+// import Home from "./pages/Homepage";
+// import TeacherDashboard from "./components/teacher/TeacherDashboard";
+// import CreateCourse from "./pages/course/CreateCourse";
+// import CreateBlog from "./pages/blog/CreateBlog";
+// import CreateBook from "./pages/book/CreateBook";
+// import MyAllArticles from "./components/ui/MyAllArticle";
+// import ProfileCard from "./pages/teacher/ProfileTeacher";
+// import AllCoursesTable from "./components/teacher/AllCourses";
+// import EditCourse from "./pages/course/EditCourse";
+// import CourseDetail from "./pages/course/CourseDetail";
+// import AllBook from "./pages/book/AllBook";
+// import CreateLesson from "./pages/lesson/CreateLesson";
+// import BlogDetail from "./pages/blog/BlogDetail";
+// import EditBlogForm from "./pages/blog/EditBlogForm";
+// import MyAllBlogs from "./components/ui/MyAllArticle";
+// import MyBook from "./components/ui/MyBook";
+// import AllBooks from "./components/teacher/AllBooks";
+// import BookDetail from "./pages/book/BookDetail";
+
+// // import TeacherDashboard from "./pages/teacher/TeacherDashboard";
+// // import NotFound from "./components/common/NotFound";
+
+// function App() {
+//   return (
+//     <Routes>
+
+//       {/* Public + layout with header/footer */}
+//       <Route element={<RootLayout />}>
+//         <Route path="/" element={<Home/>} />
+//         <Route path="/courses" element={<CoursesPage/>} />
+//         <Route path="/courses/:id" element={<CourseDetail />} />
+//         {/* <Route path="courses/:id" element={<CourseDetail />} /> */}
+//         <Route path="/about" element={<AboutUs />} />
+//         <Route path="/blogs" element={<BlogPage/>} />
+//         <Route path="/library" element={<AllBook/>} />
+//         <Route path="/profile" element={<TeacherDashboard/>} />
+//         <Route path="/teacher/create-course" element={<CreateCourse/>} />
+//         <Route path="/blogs/create" element={<CreateBlog/>} />
+//         <Route path="/teacher/add-book" element={<CreateBook/>} />
+//         <Route path="/teacher/add-lesson" element={<CreateLesson/>} />
+//         <Route path="profile/all-blogs" element={<MyAllArticles/>} />
+//         <Route path="profile/all-courses" element={<AllCoursesTable/>} />
+//         <Route path="/teacher/edit-profile" element={<ProfileCard/>} />
+//         <Route path="/dashboard/courses/:id/edit" element={<EditCourse />} />
+//         <Route path="/blogs/edit/:id" element={<EditBlogForm />} />
+//         <Route path="/blogs/:id" element={<BlogDetail />} />
+//         <Route path="/profile/all-books" element={<AllBooks/>} />
+//         <Route path="/books/:id" element={<BookDetail />} />
+
+//       </Route>
+//       <Route path="/login" element={<Login  />} />
+//       <Route path="/register" element={<Registration/>} />
+
+//       {/* Auth pages – clean layout */}
+//       {/* <Route element={<AuthLayout />}>
+//         <Route path="login" element={<Login />} /> */}
+//         {/* <Route path="register" element={<Register />} /> */}
+//       {/* </Route> */}
+
+//       {/* Protected – student & teacher */}
+//       {/* <Route element={<DashboardLayout />}> */}
+//         {/* Everyone logged in */}
+//         {/* <Route element={<ProtectedRoute />}>
+//           <Route path="profile" element={<div>Profile page (later)</div>} />
+//         </Route> */}
+
+//         {/* Only students */}
+//         {/* <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
+//           <Route path="student/dashboard" element={<StudentDashboard />} />
+//           <Route path="my-courses" element={<MyCourses />} />
+//         </Route> */}
+
+//         {/* Only teachers */}
+//         {/* <Route element={<ProtectedRoute allowedRoles={["teacher"]} />}>
+//           <Route path="teacher/dashboard" element={<TeacherDashboard />} />
+//           <Route path="teacher/courses" element={<TeacherCourses />} />
+//           <Route path="teacher/courses/new" element={<CreateCourse />} />
+//         </Route> */}
+//       {/* </Route> */}
+
+//       <Route path="*" element={<NotFound />} />
+//     </Routes>
+//   );
+// }
+
+// export default App;
+
+import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser, logout } from "./features/auth/authSlice";
 
 import RootLayout from "./layout/RootLayout";
+import BlogPage from "./pages/blog/BlogPage";
+import NotFound from "./components/home/NotFound";
+import AboutUs from "./pages/AboutUs";
+import CoursesPage from "./pages/course/Courses";
+import Login from "./pages/login/Login";
+import Registration from "./pages/register/Register";
 
-const Home = lazy(() => import("./pages/Homepage"));
-const BlogPage = lazy(() => import("./pages/blog/BlogPage"));
-const NotFound = lazy(() => import("./components/home/NotFound"));
-const AboutUs = lazy(() => import("./pages/AboutUs"));
-const CoursesPage = lazy(() => import("./pages/course/CoursePage"));
-const Login = lazy(() => import("./pages/login/Login"));
-const Registration = lazy(() => import("./pages/register/Register"));
-const TeacherDashboard = lazy(() => import("./components/teacher/TeacherDashboard"));
-const CreateCourse = lazy(() => import("./pages/course/CreateCourse"));
-const CreateBlog = lazy(() => import("./pages/blog/CreateBlog"));
-const CreateBook = lazy(() => import("./pages/book/CreateBook"));
-const MyAllArticles = lazy(() => import("./components/ui/MyAllArticle"));
-const ProfileCard = lazy(() => import("./pages/teacher/ProfileTeacher"));
-const AllCoursesTable = lazy(() => import("./components/teacher/AllCourses"));
-const EditCourse = lazy(() => import("./pages/course/EditCourse"));
-const CourseDetail = lazy(() => import("./pages/course/CourseDetail"));
-const AllBook = lazy(() => import("./pages/book/AllBook"));
-const CreateLesson = lazy(() => import("./pages/lesson/CreateLesson"));
-const BlogDetail = lazy(() => import("./pages/blog/BlogDetail"));
-const EditBlogForm = lazy(() => import("./pages/blog/EditBlogForm"));
-const AllBooks = lazy(() => import("./components/teacher/AllBooks"));
-const BookDetail = lazy(() => import("./pages/book/BookDetail"));
-const EditBook = lazy(() => import("./pages/book/EditBook"));
-const MyProgress = lazy(() => import("./pages/course/MyProgress"));
-const CoursePlayer = lazy(() => import("./pages/course/CoursePlayer"));
+import Home from "./pages/Homepage";
+import TeacherDashboard from "./components/teacher/TeacherDashboard";
+import CreateCourse from "./pages/course/CreateCourse";
+import CreateBlog from "./pages/blog/CreateBlog";
+import CreateBook from "./pages/book/CreateBook";
+import MyAllArticles from "./components/ui/MyAllArticle";
+import ProfileCard from "./pages/teacher/ProfileTeacher";
+import AllCoursesTable from "./components/teacher/AllCourses";
+import EditCourse from "./pages/course/EditCourse";
+import CourseDetail from "./pages/course/CourseDetail";
+import AllBook from "./pages/book/AllBook";
+import CreateLesson from "./pages/lesson/CreateLesson";
+import BlogDetail from "./pages/blog/BlogDetail";
+import EditBlogForm from "./pages/blog/EditBlogForm";
+import AllBooks from "./components/teacher/AllBooks";
+import BookDetail from "./pages/book/BookDetail";
+import EditBook from "./pages/book/EditBook";
+import MyProgress from "./pages/course/MyProgress";
+import CoursePlayer from "./pages/course/CoursePlayer";
+
 
 function App() {
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+  const token    = useSelector((state) => state.auth.token);
 
+  // ── Rehydrate user on every page load/refresh ──────────────────────────────
   useEffect(() => {
     if (!token) return;
 
@@ -43,6 +142,7 @@ function App() {
     })
       .then((res) => {
         if (res.status === 401) {
+          // Token expired — clean up
           dispatch(logout());
           return null;
         }
@@ -55,44 +155,41 @@ function App() {
   }, [token]);
 
   return (
-    <Suspense
-      fallback={
-        <div className="flex justify-center items-center h-screen">
-          <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-        </div>
-      }
-    >
-      <Routes>
-        <Route element={<RootLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/courses/:id" element={<CourseDetail />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/blogs" element={<BlogPage />} />
-          <Route path="/library" element={<AllBook />} />
-          <Route path="/profile" element={<TeacherDashboard />} />
-          <Route path="/teacher/create-course" element={<CreateCourse />} />
-          <Route path="/blogs/create" element={<CreateBlog />} />
-          <Route path="/teacher/add-book" element={<CreateBook />} />
-          <Route path="/teacher/add-lesson" element={<CreateLesson />} />
-          <Route path="profile/all-blogs" element={<MyAllArticles />} />
-          <Route path="profile/all-courses" element={<AllCoursesTable />} />
-          <Route path="/teacher/edit-profile" element={<ProfileCard />} />
-          <Route path="/dashboard/courses/:id/edit" element={<EditCourse />} />
-          <Route path="/blogs/edit/:id" element={<EditBlogForm />} />
-          <Route path="/dashboard/books/edit/:id" element={<EditBook />} />
-          <Route path="/blogs/:id" element={<BlogDetail />} />
-          <Route path="/profile/all-books" element={<AllBooks />} />
-          <Route path="/books/:id" element={<BookDetail />} />
-          <Route path="/my-progress" element={<MyProgress />} />
-          <Route path="/courses/:id/play" element={<CoursePlayer />} />
-        </Route>
+    <Routes>
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Registration />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Suspense>
+      {/* Public + layout with header/footer */}
+      <Route element={<RootLayout />}>
+        <Route path="/" element={<Home/>} />
+        <Route path="/courses" element={<CoursesPage/>} />
+        <Route path="/courses/:id" element={<CourseDetail />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/blogs" element={<BlogPage/>} />
+        <Route path="/library" element={<AllBook/>} />
+        <Route path="/profile" element={<TeacherDashboard/>} />
+        <Route path="/teacher/create-course" element={<CreateCourse/>} />
+        <Route path="/blogs/create" element={<CreateBlog/>} />
+        <Route path="/teacher/add-book" element={<CreateBook/>} />
+        <Route path="/teacher/add-lesson" element={<CreateLesson/>} />
+        <Route path="profile/all-blogs" element={<MyAllArticles/>} />
+        <Route path="profile/all-courses" element={<AllCoursesTable/>} />
+        <Route path="/teacher/edit-profile" element={<ProfileCard/>} />
+        <Route path="/dashboard/courses/:id/edit" element={<EditCourse />} />
+        <Route path="/blogs/edit/:id" element={<EditBlogForm />} />
+        <Route path="/dashboard/books/edit/:id" element={<EditBook />} />
+        <Route path="/blogs/:id" element={<BlogDetail />} />
+        <Route path="/profile/all-books" element={<AllBooks/>} />
+        <Route path="/books/:id" element={<BookDetail />} />
+        <Route path="/my-progress" element={<MyProgress />} />
+        <Route path="/courses/:id/play"element={<CoursePlayer />} />
+        {/* <Route path="/student"element={<StudentDashboard />} /> */}
+
+      </Route>
+
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Registration/>} />
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 
